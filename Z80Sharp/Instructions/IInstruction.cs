@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Z80Sharp.Instructions
+{
+    public interface IInstruction
+    {
+        byte[] Opcode { get; }
+        string Mnemonic { get; }
+        bool IsDocumented { get; }
+
+        int Execute(IZ80CPU cpu, byte[] instruction);
+    }
+}

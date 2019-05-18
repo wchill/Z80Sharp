@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.539
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Z80Sharp", "Z80Sharp\Z80Sharp.csproj", "{8A867A81-6B07-4A65-A077-57B2E13A54CC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Z80SharpTests", "Z80SharpTests\Z80SharpTests.csproj", "{B63784D7-7407-421E-B943-136C4A1442DE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8A867A81-6B07-4A65-A077-57B2E13A54CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A867A81-6B07-4A65-A077-57B2E13A54CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A867A81-6B07-4A65-A077-57B2E13A54CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A867A81-6B07-4A65-A077-57B2E13A54CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B63784D7-7407-421E-B943-136C4A1442DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B63784D7-7407-421E-B943-136C4A1442DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B63784D7-7407-421E-B943-136C4A1442DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B63784D7-7407-421E-B943-136C4A1442DE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E1976404-073B-43ED-93C7-4EAF9C7C18A6}
+	EndGlobalSection
+EndGlobal
