@@ -59,10 +59,10 @@ namespace Z80Sharp.Instructions
         [MainInstruction("LD L, L", 1, 0x6D)]
         public static int LD_r_rp(IZ80CPU cpu, byte[] instruction)
         {
-            var src = Utilities.ExtractBits(instruction[0], 0, 3);
+            var src = instruction[0].ExtractBits(0, 3);
             var data = ReadByteFromCpuRegister(cpu, src);
 
-            var dst = Utilities.ExtractBits(instruction[0], 3, 3);
+            var dst = instruction[0].ExtractBits(3, 3);
             WriteByteToCpuRegister(cpu, dst, data);
 
             return 4;
@@ -77,7 +77,7 @@ namespace Z80Sharp.Instructions
         [MainInstruction("LD L, n", 2, 0x2E)]
         public static int LD_r_n(IZ80CPU cpu, byte[] instruction)
         {
-            var dst = Utilities.ExtractBits(instruction[0], 3, 3);
+            var dst = instruction[0].ExtractBits(3, 3);
             WriteByteToCpuRegister(cpu, dst, instruction[1]);
 
             return 7;
@@ -92,7 +92,7 @@ namespace Z80Sharp.Instructions
         [MainInstruction("LD L, (HL)", 1, 0x6E)]
         public static int LD_r_hl_mem(IZ80CPU cpu, byte[] instruction)
         {
-            var dst = Utilities.ExtractBits(instruction[0], 3, 3);
+            var dst = instruction[0].ExtractBits(3, 3);
             var data = cpu.ReadMemory(cpu.Registers.HL);
             WriteByteToCpuRegister(cpu, dst, data);
 
@@ -108,16 +108,13 @@ namespace Z80Sharp.Instructions
         [IXInstruction("LD L, (IX+d)", 3, 0xDD, 0x6E)]
         public static int LD_r_IX_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            var offset = (sbyte) instruction[2];
-            var dst = Utilities.ExtractBits(instruction[0], 3, 3);
-            var data = cpu.ReadMemory((ushort) (cpu.Registers.IX + offset));
+            cpu.ControlLines.SystemClock.TickMultiple(5);
 
-            cpu.ControlLines.SystemClock.TickMultiple(2);
+            var dst = instruction[0].ExtractBits(3, 3);
+            var data = cpu.ReadMemory(cpu.Registers.IX.CalculateIndex(instruction[2]));
+
             WriteByteToCpuRegister(cpu, dst, data);
-
-            cpu.ControlLines.SystemClock.TickMultiple(3);
-
-            // TODO: Why does this return 19? 11 (4+4+3) for instr fetch, 3 for memory read, 5 for ???
+            
             return 19;
         }
 
@@ -130,14 +127,12 @@ namespace Z80Sharp.Instructions
         [IYInstruction("LD L, (IY+d)", 3, 0xFD, 0x6E)]
         public static int LD_r_IY_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            var offset = (sbyte)instruction[2];
-            var dst = Utilities.ExtractBits(instruction[0], 3, 3);
-            var data = cpu.ReadMemory((ushort)(cpu.Registers.IY + offset));
+            cpu.ControlLines.SystemClock.TickMultiple(5);
 
-            cpu.ControlLines.SystemClock.TickMultiple(2);
+            var dst = instruction[0].ExtractBits(3, 3);
+            var data = cpu.ReadMemory(cpu.Registers.IY.CalculateIndex(instruction[2]));
+            
             WriteByteToCpuRegister(cpu, dst, data);
-
-            cpu.ControlLines.SystemClock.TickMultiple(3);
 
             return 19;
         }
@@ -151,7 +146,7 @@ namespace Z80Sharp.Instructions
         [MainInstruction("LD (HL), L", 1, 0x75)]
         public static int LD_HL_mem_r(IZ80CPU cpu, byte[] instruction)
         {
-            var src = Utilities.ExtractBits(instruction[0], 0, 3);
+            var src = instruction[0].ExtractBits(0, 3);
             var data = ReadByteFromCpuRegister(cpu, src);
             cpu.WriteMemory(cpu.Registers.HL, data);
 
@@ -167,14 +162,12 @@ namespace Z80Sharp.Instructions
         [IXInstruction("LD (IX+d), L", 3, 0xDD, 0x75)]
         public static int LD_IX_plus_d_mem_r(IZ80CPU cpu, byte[] instruction)
         {
-            var src = Utilities.ExtractBits(instruction[0], 0, 3);
+            cpu.ControlLines.SystemClock.TickMultiple(5);
+
+            var src = instruction[1].ExtractBits(0, 3);
             var data = ReadByteFromCpuRegister(cpu, src);
-
-            var offset = (sbyte)instruction[2];
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            cpu.WriteMemory((ushort) (cpu.Registers.IX + offset), data);
-
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            
+            cpu.WriteMemory(cpu.Registers.IX.CalculateIndex(instruction[2]), data);
 
             return 19;
         }
@@ -188,14 +181,12 @@ namespace Z80Sharp.Instructions
         [IXInstruction("LD (IY+d), L", 3, 0xFD, 0x75)]
         public static int LD_IY_plus_d_mem_r(IZ80CPU cpu, byte[] instruction)
         {
-            var src = Utilities.ExtractBits(instruction[0], 0, 3);
+            cpu.ControlLines.SystemClock.TickMultiple(5);
+
+            var src = instruction[1].ExtractBits(0, 3);
             var data = ReadByteFromCpuRegister(cpu, src);
-
-            var offset = (sbyte)instruction[2];
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            cpu.WriteMemory((ushort)(cpu.Registers.IY + offset), data);
-
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            
+            cpu.WriteMemory(cpu.Registers.IY.CalculateIndex(instruction[2]), data);
 
             return 19;
         }
@@ -211,10 +202,8 @@ namespace Z80Sharp.Instructions
         [IXInstruction("LD (IX+d), n", 4, 0xDD, 0x36)]
         public static int LD_IX_plus_d_mem_n(IZ80CPU cpu, byte[] instruction)
         {
-            var offset = (sbyte)instruction[2];
-
             cpu.ControlLines.SystemClock.TickMultiple(2);
-            cpu.WriteMemory((ushort)(cpu.Registers.IX + offset), instruction[3]);
+            cpu.WriteMemory(cpu.Registers.IX.CalculateIndex(instruction[2]), instruction[3]);
 
             return 19;
         }
@@ -222,10 +211,8 @@ namespace Z80Sharp.Instructions
         [IYInstruction("LD (IY+d), n", 4, 0xFD, 0x36)]
         public static int LD_IY_plus_d_mem_n(IZ80CPU cpu, byte[] instruction)
         {
-            var offset = (sbyte)instruction[2];
-
             cpu.ControlLines.SystemClock.TickMultiple(2);
-            cpu.WriteMemory((ushort)(cpu.Registers.IY + offset), instruction[3]);
+            cpu.WriteMemory(cpu.Registers.IX.CalculateIndex(instruction[2]), instruction[3]);
 
             return 19;
         }
@@ -278,7 +265,7 @@ namespace Z80Sharp.Instructions
         public static int LD_A_I(IZ80CPU cpu, byte[] instruction)
         {
             cpu.Registers.A = cpu.Registers.I;
-            cpu.Registers.Sign = Utilities.IsUnsignedByteNegative(cpu.Registers.A);
+            cpu.Registers.Sign = cpu.Registers.A.IsNegative();
             cpu.Registers.Zero = cpu.Registers.A == 0;
             cpu.Registers.HalfCarry = false;
 
@@ -295,7 +282,7 @@ namespace Z80Sharp.Instructions
         public static int LD_A_R(IZ80CPU cpu, byte[] instruction)
         {
             cpu.Registers.A = cpu.Registers.R;
-            cpu.Registers.Sign = Utilities.IsUnsignedByteNegative(cpu.Registers.A);
+            cpu.Registers.Sign = cpu.Registers.A.IsNegative();
             cpu.Registers.Zero = cpu.Registers.A == 0;
             cpu.Registers.HalfCarry = false;
 
@@ -334,7 +321,7 @@ namespace Z80Sharp.Instructions
         [MainInstruction("LD SP, nn", 3, 0x31)]
         public static int LD_dd_nn(IZ80CPU cpu, byte[] instruction)
         {
-            var dst = Utilities.ExtractBits(instruction[0], 4, 2);
+            var dst = instruction[0].ExtractBits(4, 2);
             var nn = Utilities.LETo16Bit(instruction[1], instruction[2]);
             WriteWordToCpuRegister_BC_DE_HL_SP(cpu, dst, nn);
 
@@ -363,8 +350,7 @@ namespace Z80Sharp.Instructions
         public static int LD_HL_nn_mem(IZ80CPU cpu, byte[] instruction)
         {
             var nn = Utilities.LETo16Bit(instruction[1], instruction[2]);
-            cpu.Registers.HL = Utilities.LETo16Bit(
-                cpu.ReadMemory(nn), cpu.ReadMemory((ushort) (nn + 1)));
+            cpu.Registers.HL = cpu.ReadWord(nn);
 
             return 16;
         }
@@ -375,10 +361,9 @@ namespace Z80Sharp.Instructions
         [ExtendedInstruction("LD SP, (nn)", 4, 0xED, 0x7B)]
         public static int LD_dd_nn_mem(IZ80CPU cpu, byte[] instruction)
         {
-            var dst = Utilities.ExtractBits(instruction[1], 4, 2);
+            var dst = instruction[1].ExtractBits(4, 2);
             var nn = Utilities.LETo16Bit(instruction[2], instruction[3]);
-            var word = Utilities.LETo16Bit(
-                cpu.ReadMemory(nn), cpu.ReadMemory((ushort)(nn + 1)));
+            var word = cpu.ReadWord(nn);
 
             WriteWordToCpuRegister_BC_DE_HL_SP(cpu, dst, word);
 
@@ -389,9 +374,7 @@ namespace Z80Sharp.Instructions
         public static int LD_IX_nn_mem(IZ80CPU cpu, byte[] instruction)
         {
             var nn = Utilities.LETo16Bit(instruction[2], instruction[3]);
-            var word = Utilities.LETo16Bit(
-                cpu.ReadMemory(nn), cpu.ReadMemory((ushort)(nn + 1)));
-            cpu.Registers.IX = word;
+            cpu.Registers.IX = cpu.ReadWord(nn);
             return 20;
         }
 
@@ -399,9 +382,7 @@ namespace Z80Sharp.Instructions
         public static int LD_IY_nn_mem(IZ80CPU cpu, byte[] instruction)
         {
             var nn = Utilities.LETo16Bit(instruction[2], instruction[3]);
-            var word = Utilities.LETo16Bit(
-                cpu.ReadMemory(nn), cpu.ReadMemory((ushort)(nn + 1)));
-            cpu.Registers.IY = word;
+            cpu.Registers.IY = cpu.ReadWord(nn);
             return 20;
         }
 
@@ -409,10 +390,7 @@ namespace Z80Sharp.Instructions
         public static int LD_nn_mem_HL(IZ80CPU cpu, byte[] instruction)
         {
             var addr = Utilities.LETo16Bit(instruction[1], instruction[2]);
-            cpu.WriteMemory(addr, cpu.Registers.L);
-
-            addr++;
-            cpu.WriteMemory(addr, cpu.Registers.H);
+            cpu.WriteWord(addr, cpu.Registers.HL);
 
             return 16;
         }
@@ -423,13 +401,10 @@ namespace Z80Sharp.Instructions
         [ExtendedInstruction("LD (nn), SP", 4, 0xED, 0x73)]
         public static int LD_nn_mem_dd(IZ80CPU cpu, byte[] instruction)
         {
-            var src = Utilities.ExtractBits(instruction[1], 4, 2);
+            var src = instruction[1].ExtractBits(4, 2);
             var addr = Utilities.LETo16Bit(instruction[2], instruction[3]);
             var data = ReadWordFromCpuRegister_BC_DE_HL_SP(cpu, src);
-            cpu.WriteMemory(addr, Utilities.GetLowerByteOfWord(data));
-
-            addr++;
-            cpu.WriteMemory(addr, Utilities.GetUpperByteOfWord(data));
+            cpu.WriteWord(addr, data);
 
             return 20;
         }
@@ -438,10 +413,7 @@ namespace Z80Sharp.Instructions
         public static int LD_nn_mem_IX(IZ80CPU cpu, byte[] instruction)
         {
             var addr = Utilities.LETo16Bit(instruction[2], instruction[3]);
-            cpu.WriteMemory(addr, cpu.Registers.IXLower);
-
-            addr++;
-            cpu.WriteMemory(addr, cpu.Registers.IXUpper);
+            cpu.WriteWord(addr, cpu.Registers.IX);
 
             return 20;
         }
@@ -450,10 +422,7 @@ namespace Z80Sharp.Instructions
         public static int LD_nn_mem_IY(IZ80CPU cpu, byte[] instruction)
         {
             var addr = Utilities.LETo16Bit(instruction[2], instruction[3]);
-            cpu.WriteMemory(addr, cpu.Registers.IYLower);
-
-            addr++;
-            cpu.WriteMemory(addr, cpu.Registers.IYUpper);
+            cpu.WriteWord(addr, cpu.Registers.IY);
 
             return 20;
         }
@@ -494,16 +463,11 @@ namespace Z80Sharp.Instructions
         [MainInstruction("PUSH AF", 1, 0xF5)]
         public static int PUSH_qq(IZ80CPU cpu, byte[] instruction)
         {
-            var src = Utilities.ExtractBits(instruction[0], 4, 2);
+            var src = instruction[0].ExtractBits(4, 2);
             var data = ReadWordFromCpuRegister_BC_DE_HL_AF(cpu, src);
 
             cpu.ControlLines.SystemClock.TickMultiple(2);
-
-            cpu.Registers.SP--;
-            cpu.WriteMemory(cpu.Registers.SP, Utilities.GetUpperByteOfWord(data));
-
-            cpu.Registers.SP--;
-            cpu.WriteMemory(cpu.Registers.SP, Utilities.GetLowerByteOfWord(data));
+            cpu.PushWord(data);
 
             return 11;
         }
@@ -512,12 +476,8 @@ namespace Z80Sharp.Instructions
         public static int PUSH_IX(IZ80CPU cpu, byte[] instruction)
         {
             cpu.ControlLines.SystemClock.TickMultiple(2);
+            cpu.PushWord(cpu.Registers.IX);
 
-            cpu.Registers.SP--;
-            cpu.WriteMemory(cpu.Registers.SP, cpu.Registers.IXUpper);
-
-            cpu.Registers.SP--;
-            cpu.WriteMemory(cpu.Registers.SP, cpu.Registers.IXLower);
             return 15;
         }
 
@@ -525,12 +485,8 @@ namespace Z80Sharp.Instructions
         public static int PUSH_IY(IZ80CPU cpu, byte[] instruction)
         {
             cpu.ControlLines.SystemClock.TickMultiple(2);
+            cpu.PushWord(cpu.Registers.IY);
 
-            cpu.Registers.SP--;
-            cpu.WriteMemory(cpu.Registers.SP, cpu.Registers.IYUpper);
-
-            cpu.Registers.SP--;
-            cpu.WriteMemory(cpu.Registers.SP, cpu.Registers.IYLower);
             return 15;
         }
 
@@ -540,15 +496,15 @@ namespace Z80Sharp.Instructions
         [MainInstruction("POP AF", 1, 0xF1)]
         public static int POP_qq(IZ80CPU cpu, byte[] instruction)
         {
-            var dst = Utilities.ExtractBits(instruction[0], 4, 2);
-            var lower = cpu.ReadMemory(cpu.Registers.SP);
-            cpu.Registers.SP++;
-            var word = Utilities.SetLowerByteOfWord(ReadWordFromCpuRegister_BC_DE_HL_AF(cpu, dst), lower);
+            var dst = instruction[0].ExtractBits(4, 2);
+
+            var lower = cpu.PopByte();
+            var word = ReadWordFromCpuRegister_BC_DE_HL_AF(cpu, dst).SetLowerByte(lower);
             WriteWordToCpuRegister_BC_DE_HL_AF(cpu, dst, word);
 
-            var upper = cpu.ReadMemory(cpu.Registers.SP);
-            cpu.Registers.SP++;
-            WriteWordToCpuRegister_BC_DE_HL_AF(cpu, dst, Utilities.SetUpperByteOfWord(word, upper));
+            var upper = cpu.PopByte();
+            word = word.SetUpperByte(upper);
+            WriteWordToCpuRegister_BC_DE_HL_AF(cpu, dst, word);
 
             return 10;
         }
@@ -556,11 +512,8 @@ namespace Z80Sharp.Instructions
         [IXInstruction("POP IX", 2, 0xDD, 0xE1)]
         public static int POP_IX(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.Registers.IXLower = cpu.ReadMemory(cpu.Registers.SP);
-            cpu.Registers.SP++;
-
-            cpu.Registers.IXUpper = cpu.ReadMemory(cpu.Registers.SP);
-            cpu.Registers.SP++;
+            cpu.Registers.IXLower = cpu.PopByte();
+            cpu.Registers.IXUpper = cpu.PopByte();
 
             return 14;
         }
@@ -568,94 +521,12 @@ namespace Z80Sharp.Instructions
         [IYInstruction("POP IY", 2, 0xDD, 0xE1)]
         public static int POP_IY(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.Registers.IYLower = cpu.ReadMemory(cpu.Registers.SP);
-            cpu.Registers.SP++;
-
-            cpu.Registers.IYUpper = cpu.ReadMemory(cpu.Registers.SP);
-            cpu.Registers.SP++;
+            cpu.Registers.IYLower = cpu.PopByte();
+            cpu.Registers.IYUpper = cpu.PopByte();
 
             return 14;
         }
         #endregion
 
-        #region Helper methods
-        private static void WriteByteToCpuRegister(IZ80CPU cpu, int register, byte data)
-        {
-            switch (register)
-            {
-                case 0b111: cpu.Registers.A = data; break;
-                case 0b000: cpu.Registers.B = data; break;
-                case 0b001: cpu.Registers.C = data; break;
-                case 0b010: cpu.Registers.D = data; break;
-                case 0b011: cpu.Registers.E = data; break;
-                case 0b100: cpu.Registers.H = data; break;
-                case 0b101: cpu.Registers.L = data; break;
-                default: throw new InvalidOperationException();
-            }
-        }
-
-        private static void WriteWordToCpuRegister_BC_DE_HL_SP(IZ80CPU cpu, int register, ushort data)
-        {
-            switch (register)
-            {
-                case 0b00: cpu.Registers.BC = data; break;
-                case 0b01: cpu.Registers.DE = data; break;
-                case 0b10: cpu.Registers.HL = data; break;
-                case 0b11: cpu.Registers.SP = data; break;
-                default: throw new InvalidOperationException();
-            }
-        }
-
-        private static void WriteWordToCpuRegister_BC_DE_HL_AF(IZ80CPU cpu, int register, ushort data)
-        {
-            switch (register)
-            {
-                case 0b00: cpu.Registers.BC = data; break;
-                case 0b01: cpu.Registers.DE = data; break;
-                case 0b10: cpu.Registers.HL = data; break;
-                case 0b11: cpu.Registers.AF = data; break;
-                default: throw new InvalidOperationException();
-            }
-        }
-
-        private static byte ReadByteFromCpuRegister(IZ80CPU cpu, int register)
-        {
-            switch (register)
-            {
-                case 0b111: return cpu.Registers.A;
-                case 0b000: return cpu.Registers.B;
-                case 0b001: return cpu.Registers.C;
-                case 0b010: return cpu.Registers.D;
-                case 0b011: return cpu.Registers.E;
-                case 0b100: return cpu.Registers.H;
-                case 0b101: return cpu.Registers.L;
-                default: throw new InvalidOperationException();
-            }
-        }
-
-        private static ushort ReadWordFromCpuRegister_BC_DE_HL_SP(IZ80CPU cpu, int register)
-        {
-            switch (register)
-            {
-                case 0b00: return cpu.Registers.BC;
-                case 0b01: return cpu.Registers.DE;
-                case 0b10: return cpu.Registers.HL;
-                case 0b11: return cpu.Registers.SP;
-                default: throw new InvalidOperationException();
-            }
-        }
-
-        private static ushort ReadWordFromCpuRegister_BC_DE_HL_AF(IZ80CPU cpu, int register)
-        {
-            switch (register)
-            {
-                case 0b00: return cpu.Registers.BC;
-                case 0b01: return cpu.Registers.DE;
-                case 0b10: return cpu.Registers.HL;
-                case 0b11: return cpu.Registers.AF;
-                default: throw new InvalidOperationException();
-            }
-        }
-        #endregion
     }
 }

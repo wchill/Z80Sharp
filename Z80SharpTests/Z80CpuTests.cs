@@ -11,10 +11,13 @@ namespace Z80SharpTests
         public void TestOpcodeFetchTakes4Cycles()
         {
             var cpu = GetZ80Cpu();
+            Assert.Equal(0, cpu.Registers.R);
+
             var clock = cpu.ControlLines.SystemClock;
             cpu.FetchOpcode();
 
             Assert.Equal(4, clock.Ticks);
+            Assert.Equal(1, cpu.Registers.R);
         }
 
         [Fact]

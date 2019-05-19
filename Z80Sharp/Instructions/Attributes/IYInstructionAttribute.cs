@@ -9,5 +9,6 @@
         public IYInstructionAttribute(string mnemonic, int instrLength, bool undocumented, params byte[] opcodeBytes) : base(mnemonic, instrLength, undocumented, opcodeBytes)
         {
         }
+        public override byte[] OpcodePrefix => new byte[] { 0xFD };
     }
 }

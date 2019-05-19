@@ -8,7 +8,10 @@ namespace Z80Sharp
     {
         private readonly List<IDevice> _attachedDevices;
         public IReadOnlyList<IDevice> AttachedDevices => _attachedDevices;
-        public ushort Value { get; private set; }
+
+        public ushort Value => _value.GetValueOrDefault(0xFFFF);
+
+        private ushort? _value;
 
         public AddressBus()
         {
@@ -17,7 +20,7 @@ namespace Z80Sharp
 
         public void WriteValue(IDevice device, ushort value)
         {
-            Value = value;
+            _value = value;
         }
 
         public void AttachDevice(IDevice device)

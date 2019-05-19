@@ -5,5 +5,6 @@
         public MainInstructionAttribute(string mnemonic, int instrLength, byte opcodeByte) : base(mnemonic, instrLength, opcodeByte)
         {
         }
+        public override byte[] OpcodePrefix => new byte[] {};
     }
 }

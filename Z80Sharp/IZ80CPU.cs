@@ -10,8 +10,13 @@ namespace Z80Sharp
         Z80CPULines ControlLines { get; }
 
         byte FetchOpcode();
+        void RefreshMemory();
         byte ReadMemory(ushort address);
+        ushort ReadWord(ushort address);
+        byte PopByte();
         void WriteMemory(ushort address, byte data);
+        void WriteWord(ushort address, ushort data);
+        void PushWord(ushort data);
         byte ReadFromPort(ushort address);
         void WriteToPort(ushort address, byte data);
     }

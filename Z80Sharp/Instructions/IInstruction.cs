@@ -8,7 +8,7 @@ namespace Z80Sharp.Instructions
     {
         byte[] Opcode { get; }
         string Mnemonic { get; }
-        bool IsDocumented { get; }
+        bool Undocumented { get; }
 
         int Execute(IZ80CPU cpu, byte[] instruction);
     }

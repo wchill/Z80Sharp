@@ -12,7 +12,7 @@ namespace Z80SharpTests
         [InlineData(0xFF, 1, 3, 0x0E)]
         public void TestExtractBits(int num, int start, int len, int expected)
         {
-            Assert.Equal(expected, Utilities.ExtractBits(num, start, len));
+            Assert.Equal(expected, num.ExtractBits(start, len));
         }
 
         [Theory]
@@ -22,8 +22,8 @@ namespace Z80SharpTests
         [InlineData(0x00, 7, 0x00)]
         public void TestGetBitAsByte(int num, int bitNum, int expected)
         {
-            Assert.Equal(expected, Utilities.GetBitAsByte(num, bitNum));
-            Assert.Equal(expected != 0, Utilities.GetBit(num, bitNum));
+            Assert.Equal(expected, num.GetBitAsByte(bitNum));
+            Assert.Equal(expected != 0, num.GetBit(bitNum));
         }
 
         [Theory]
@@ -35,7 +35,38 @@ namespace Z80SharpTests
         [InlineData(0x00, false, 7, 0x00)]
         public void TestSetBit(byte num, bool bit, int bitNum, byte expected)
         {
-            Assert.Equal(expected, Utilities.SetBit(num, bit, bitNum));
+            Assert.Equal(expected, num.SetBit(bit, bitNum));
+        }
+
+        [Theory]
+        [InlineData(120, 105, true)]
+        [InlineData(120, -105, false)]
+        [InlineData(-120, -105, true)]
+        [InlineData(0, -105, false)]
+        [InlineData(0, 0, false)]
+        public void TestDetectOverflow(sbyte a, sbyte b, bool expected)
+        {
+            Assert.Equal(expected, ((byte)a).WillOverflow((byte) b));
+        }
+
+        [Theory]
+        [InlineData(0b11011, 0b11100101)]
+        [InlineData(0b11111111, 0b1)]
+        [InlineData(0b1111111, 0b10000001)]
+        public void TestTwosComplement(byte b, byte expected)
+        {
+            Assert.Equal(expected, b.TwosComplement());
+        }
+
+        [Theory]
+        [InlineData(0x100, 0, 0x100)]
+        [InlineData(0x100, 1, 0x101)]
+        [InlineData(0x100, -1, 0xFF)]
+        [InlineData(0x1, -2, 0xFFFF)]
+        [InlineData(0xFFFF, 2, 0x1)]
+        public void TestCalculateIndex(ushort index, sbyte offset, ushort expected)
+        {
+            Assert.Equal(expected, index.CalculateIndex((byte) offset));
         }
     }
 }

@@ -3,8 +3,9 @@
 namespace Z80Sharp.Instructions.Attributes
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class InstructionAttribute : Attribute
+    public abstract class InstructionAttribute : Attribute
     {
+        public abstract byte[] OpcodePrefix { get; }
         public byte[] Opcode { get; }
         public string Mnemonic { get; }
         public int Length { get; }
