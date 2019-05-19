@@ -40,7 +40,7 @@ namespace Z80Sharp.Instructions
 
         public override string ToString()
         {
-            var hexStr = string.Join(" ", Opcode.Select(b => b.ToString("X4")));
+            var hexStr = string.Join(" ", Opcode.Select(b => b.ToString("X2")));
             if (Undocumented)
             {
                 return $"{Mnemonic} (undocumented; {hexStr})";

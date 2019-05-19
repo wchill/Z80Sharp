@@ -263,13 +263,13 @@ namespace Z80Sharp.Instructions
             return 15;
         }
 
-        [BitInstruction("RR A", 2, 0xCB, 0x17)]
-        [BitInstruction("RR B", 2, 0xCB, 0x10)]
-        [BitInstruction("RR C", 2, 0xCB, 0x11)]
-        [BitInstruction("RR D", 2, 0xCB, 0x12)]
-        [BitInstruction("RR E", 2, 0xCB, 0x13)]
-        [BitInstruction("RR H", 2, 0xCB, 0x14)]
-        [BitInstruction("RR L", 2, 0xCB, 0x15)]
+        [BitInstruction("RR A", 2, 0xCB, 0x1F)]
+        [BitInstruction("RR B", 2, 0xCB, 0x18)]
+        [BitInstruction("RR C", 2, 0xCB, 0x19)]
+        [BitInstruction("RR D", 2, 0xCB, 0x1A)]
+        [BitInstruction("RR E", 2, 0xCB, 0x1B)]
+        [BitInstruction("RR H", 2, 0xCB, 0x1C)]
+        [BitInstruction("RR L", 2, 0xCB, 0x1D)]
         public static int RR_r(IZ80CPU cpu, byte[] instruction)
         {
             var reg = instruction[1].ExtractBits(0, 3);
@@ -284,7 +284,7 @@ namespace Z80Sharp.Instructions
             return 8;
         }
 
-        [BitInstruction("RR (HL)", 2, 0xCB, 0x16)]
+        [BitInstruction("RR (HL)", 2, 0xCB, 0x1E)]
         public static int RR_HL_mem(IZ80CPU cpu, byte[] instruction)
         {
             cpu.ControlLines.SystemClock.Tick();
@@ -299,7 +299,7 @@ namespace Z80Sharp.Instructions
             return 15;
         }
 
-        [IXBitInstruction("RR (IX+d)", 4, 0xDD, 0xCB, 0x00, 0x16)]
+        [IXBitInstruction("RR (IX+d)", 4, 0xDD, 0xCB, 0x00, 0x1E)]
         public static int RR_IX_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
             cpu.ControlLines.SystemClock.TickMultiple(2);
@@ -318,7 +318,7 @@ namespace Z80Sharp.Instructions
             return 15;
         }
 
-        [IYBitInstruction("RR (IY+d)", 4, 0xFD, 0xCB, 0x00, 0x16)]
+        [IYBitInstruction("RR (IY+d)", 4, 0xFD, 0xCB, 0x00, 0x1E)]
         public static int RR_IY_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
             cpu.ControlLines.SystemClock.TickMultiple(2);

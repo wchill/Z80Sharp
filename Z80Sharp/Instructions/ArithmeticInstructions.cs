@@ -527,7 +527,7 @@ namespace Z80Sharp.Instructions
             return 23;
         }
 
-        [IXInstruction("INC (IY+d)", 3, 0xFD, 0x34)]
+        [IYInstruction("INC (IY+d)", 3, 0xFD, 0x34)]
         public static int INC_IY_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
             cpu.ControlLines.SystemClock.TickMultiple(5);
@@ -600,7 +600,7 @@ namespace Z80Sharp.Instructions
             return 23;
         }
 
-        [IXInstruction("DEC (IY+d)", 3, 0xFD, 0x35)]
+        [IYInstruction("DEC (IY+d)", 3, 0xFD, 0x35)]
         public static int DEC_IY_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
             cpu.ControlLines.SystemClock.TickMultiple(5);

@@ -8,19 +8,16 @@ namespace Z80Sharp.Instructions
 {
     public static class InstructionDecoder
     {
-        private static readonly IInstruction[] MainInstructions;
-        private static readonly IInstruction[] ExtendedInstructions;
-        private static readonly IInstruction[] BitInstructions;
-        private static readonly IInstruction[] IXInstructions;
-        private static readonly IInstruction[] IYInstructions;
-        private static readonly IInstruction[] IXBitInstructions;
-        private static readonly IInstruction[] IYBitInstructions;
-
-        public static readonly HashSet<byte[]> LoadedOpcodes;
+        public static readonly IInstruction[] MainInstructions;
+        public static readonly IInstruction[] ExtendedInstructions;
+        public static readonly IInstruction[] BitInstructions;
+        public static readonly IInstruction[] IXInstructions;
+        public static readonly IInstruction[] IYInstructions;
+        public static readonly IInstruction[] IXBitInstructions;
+        public static readonly IInstruction[] IYBitInstructions;
 
         static InstructionDecoder()
         {
-            LoadedOpcodes = new HashSet<byte[]>();
             MainInstructions = ConstructInstructionTablesByReflection<MainInstructionAttribute>();
             ExtendedInstructions = ConstructInstructionTablesByReflection<ExtendedInstructionAttribute>();
             BitInstructions = ConstructInstructionTablesByReflection<BitInstructionAttribute>();
@@ -112,9 +109,9 @@ namespace Z80Sharp.Instructions
                     var func = (Func<IZ80CPU, byte[], int>)Delegate.CreateDelegate(typeof(Func<IZ80CPU, byte[], int>), method);
                     var instruction = new Instruction(attr.Opcode, attr.Mnemonic, func);
 
-                    if (!LoadedOpcodes.Add(attr.Opcode))
+                    if (instructions[attr.Opcode.Last()] != null)
                     {
-                        throw new InvalidOperationException($"Duplicate instruction loaded: {instruction}");
+                        throw new InvalidOperationException($"Duplicate instruction {instruction} loaded but {instructions[attr.Opcode.Last()]} exists");
                     }
 
                     instructions[attr.Opcode.Last()] = instruction;

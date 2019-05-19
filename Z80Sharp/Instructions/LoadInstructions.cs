@@ -84,11 +84,11 @@ namespace Z80Sharp.Instructions
         }
 
         [MainInstruction("LD A, (HL)", 1, 0x7E)]
-        [MainInstruction("LD B, (HL)", 1, 0x45)]
+        [MainInstruction("LD B, (HL)", 1, 0x46)]
         [MainInstruction("LD C, (HL)", 1, 0x4E)]
-        [MainInstruction("LD D, (HL)", 1, 0x55)]
+        [MainInstruction("LD D, (HL)", 1, 0x56)]
         [MainInstruction("LD E, (HL)", 1, 0x5E)]
-        [MainInstruction("LD H, (HL)", 1, 0x65)]
+        [MainInstruction("LD H, (HL)", 1, 0x66)]
         [MainInstruction("LD L, (HL)", 1, 0x6E)]
         public static int LD_r_hl_mem(IZ80CPU cpu, byte[] instruction)
         {
@@ -172,13 +172,13 @@ namespace Z80Sharp.Instructions
             return 19;
         }
 
-        [IXInstruction("LD (IY+d), A", 3, 0xFD, 0x77)]
-        [IXInstruction("LD (IY+d), B", 3, 0xFD, 0x70)]
-        [IXInstruction("LD (IY+d), C", 3, 0xFD, 0x71)]
-        [IXInstruction("LD (IY+d), D", 3, 0xFD, 0x72)]
-        [IXInstruction("LD (IY+d), E", 3, 0xFD, 0x73)]
-        [IXInstruction("LD (IY+d), H", 3, 0xFD, 0x74)]
-        [IXInstruction("LD (IY+d), L", 3, 0xFD, 0x75)]
+        [IYInstruction("LD (IY+d), A", 3, 0xFD, 0x77)]
+        [IYInstruction("LD (IY+d), B", 3, 0xFD, 0x70)]
+        [IYInstruction("LD (IY+d), C", 3, 0xFD, 0x71)]
+        [IYInstruction("LD (IY+d), D", 3, 0xFD, 0x72)]
+        [IYInstruction("LD (IY+d), E", 3, 0xFD, 0x73)]
+        [IYInstruction("LD (IY+d), H", 3, 0xFD, 0x74)]
+        [IYInstruction("LD (IY+d), L", 3, 0xFD, 0x75)]
         public static int LD_IY_plus_d_mem_r(IZ80CPU cpu, byte[] instruction)
         {
             cpu.ControlLines.SystemClock.TickMultiple(5);
