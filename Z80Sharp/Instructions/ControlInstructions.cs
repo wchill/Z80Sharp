@@ -213,5 +213,134 @@ namespace Z80Sharp.Instructions
         }
 
         #endregion
+
+        #region Call/Return
+
+        [MainInstruction("CALL nn", 3, 0xCD)]
+        public static int CALL_nn(IZ80CPU cpu, byte[] instruction)
+        {
+            cpu.ControlLines.SystemClock.Tick();
+            cpu.PushWord(cpu.Registers.PC);
+            cpu.Registers.PC = Utilities.LETo16Bit(instruction[1], instruction[2]);
+
+            return 17;
+        }
+
+        [MainInstruction("CALL NZ, nn", 3, 0xC4)]
+        [MainInstruction("CALL Z, nn", 3, 0xCC)]
+        [MainInstruction("CALL NC, nn", 3, 0xD4)]
+        [MainInstruction("CALL C, nn", 3, 0xDC)]
+        [MainInstruction("CALL PO, nn", 3, 0xE4)]
+        [MainInstruction("CALL PE, nn", 3, 0xEC)]
+        [MainInstruction("CALL P, nn", 3, 0xF4)]
+        [MainInstruction("CALL N, nn", 3, 0xFC)]
+        public static int CALL_cc_nn(IZ80CPU cpu, byte[] instruction)
+        {
+            var condition = instruction[0].ExtractBits(3, 3);
+            var shouldJump = false;
+
+            switch (condition)
+            {
+                case 0b000: shouldJump = !cpu.Registers.Zero; break;
+                case 0b001: shouldJump = cpu.Registers.Zero; break;
+                case 0b010: shouldJump = !cpu.Registers.Carry; break;
+                case 0b011: shouldJump = cpu.Registers.Carry; break;
+                case 0b100: shouldJump = !cpu.Registers.ParityOrOverflow; break;
+                case 0b101: shouldJump = cpu.Registers.ParityOrOverflow; break;
+                case 0b110: shouldJump = !cpu.Registers.Sign; break;
+                case 0b111: shouldJump = cpu.Registers.Sign; break;
+                default: throw new InvalidOperationException();
+            }
+
+            if (!shouldJump) return 10;
+
+            cpu.ControlLines.SystemClock.Tick();
+            cpu.PushWord(cpu.Registers.PC);
+            cpu.Registers.PC = Utilities.LETo16Bit(instruction[1], instruction[2]);
+
+            return 17;
+        }
+
+        [MainInstruction("RET", 1, 0xC9)]
+        public static int RET(IZ80CPU cpu, byte[] instruction)
+        {
+            cpu.Registers.PC = cpu.Registers.PC.SetLowerByte(cpu.PopByte());
+            cpu.Registers.PC = cpu.Registers.PC.SetUpperByte(cpu.PopByte());
+
+            return 10;
+        }
+
+        [MainInstruction("RET NZ", 1, 0xC0)]
+        [MainInstruction("RET Z", 1, 0xC8)]
+        [MainInstruction("RET NC", 1, 0xD0)]
+        [MainInstruction("RET C", 1, 0xD8)]
+        [MainInstruction("RET PO", 1, 0xE0)]
+        [MainInstruction("RET PE", 1, 0xE8)]
+        [MainInstruction("RET P", 1, 0xF0)]
+        [MainInstruction("RET N", 1, 0xF8)]
+        public static int RET_cc(IZ80CPU cpu, byte[] instruction)
+        {
+            cpu.ControlLines.SystemClock.Tick();
+            var condition = instruction[0].ExtractBits(3, 3);
+            var shouldJump = false;
+
+            switch (condition)
+            {
+                case 0b000: shouldJump = !cpu.Registers.Zero; break;
+                case 0b001: shouldJump = cpu.Registers.Zero; break;
+                case 0b010: shouldJump = !cpu.Registers.Carry; break;
+                case 0b011: shouldJump = cpu.Registers.Carry; break;
+                case 0b100: shouldJump = !cpu.Registers.ParityOrOverflow; break;
+                case 0b101: shouldJump = cpu.Registers.ParityOrOverflow; break;
+                case 0b110: shouldJump = !cpu.Registers.Sign; break;
+                case 0b111: shouldJump = cpu.Registers.Sign; break;
+                default: throw new InvalidOperationException();
+            }
+
+            if (!shouldJump) return 5;
+
+            cpu.Registers.PC = cpu.Registers.PC.SetLowerByte(cpu.PopByte());
+            cpu.Registers.PC = cpu.Registers.PC.SetUpperByte(cpu.PopByte());
+
+            return 11;
+        }
+
+        [ExtendedInstruction("RETI", 2, 0xED, 0x4D)]
+        public static int RETI(IZ80CPU cpu, byte[] instruction)
+        {
+            cpu.Registers.PC = cpu.Registers.PC.SetLowerByte(cpu.PopByte());
+            cpu.Registers.PC = cpu.Registers.PC.SetUpperByte(cpu.PopByte());
+
+            return 14;
+        }
+
+        [ExtendedInstruction("RETN", 2, 0xED, 0x45)]
+        public static int RETN(IZ80CPU cpu, byte[] instruction)
+        {
+            cpu.Registers.PC = cpu.Registers.PC.SetLowerByte(cpu.PopByte());
+            cpu.Registers.PC = cpu.Registers.PC.SetUpperByte(cpu.PopByte());
+            cpu.Registers.IFF1 = cpu.Registers.IFF2;
+
+            return 14;
+        }
+
+        [MainInstruction("RST 00h", 1, 0xC7)]
+        [MainInstruction("RST 08h", 1, 0xCF)]
+        [MainInstruction("RST 10h", 1, 0xD7)]
+        [MainInstruction("RST 18h", 1, 0xDF)]
+        [MainInstruction("RST 20h", 1, 0xE7)]
+        [MainInstruction("RST 28h", 1, 0xEF)]
+        [MainInstruction("RST 30h", 1, 0xF7)]
+        [MainInstruction("RST 38h", 1, 0xFF)]
+        public static int RST_p(IZ80CPU cpu, byte[] instruction)
+        {
+            cpu.ControlLines.SystemClock.Tick();
+            cpu.PushWord(cpu.Registers.PC);
+            cpu.Registers.PC = (ushort) (instruction[0].ExtractBits(3, 3) * 8);
+
+            return 11;
+        }
+
+        #endregion
     }
 }

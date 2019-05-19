@@ -120,10 +120,10 @@ namespace Z80Sharp
 
         public void PushWord(ushort data)
         {
-            WriteMemory(Registers.SP, data.GetLowerByte());
-            Registers.SP++;
+            Registers.SP--;
             WriteMemory(Registers.SP, data.GetUpperByte());
-            Registers.SP++;
+            Registers.SP--;
+            WriteMemory(Registers.SP, data.GetLowerByte());
         }
 
         public byte ReadFromPort(ushort address)
