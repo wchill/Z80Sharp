@@ -33,11 +33,11 @@ namespace Z80Sharp.Instructions
                 $"Instruction {string.Join(" ", instruction.Select(b => b.ToString("X4")))} is not implemented.");
         }
 
-        public static IInstruction DecodeNextInstruction(IZ80CPU cpu, out byte[] instrBytes)
+        public static IInstruction DecodeNextInstruction(IZ80CPU cpu, out byte[] instrBytes, byte? initialByte = null)
         {
             var data = new List<byte>
             {
-                cpu.FetchOpcode()
+                initialByte ?? cpu.FetchOpcode()
             };
             IInstruction instruction;
 

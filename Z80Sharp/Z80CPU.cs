@@ -27,16 +27,102 @@ namespace Z80Sharp
             {
                 throw new InvalidOperationException($"Cycle mismatch when executing instruction {instruction.Mnemonic}");
             }
+
+            if (Registers.IFF1 && ControlLines.INT.Value == TristateWireState.LogicLow)
+            {
+                HandleINT();
+            }
         }
 
-        private void PostMachineCycle()
+        private void HandleNMI()
         {
+            Registers.IFF2 = Registers.IFF1;
+            Registers.IFF1 = false;
+            ControlLines.SystemClock.Tick();
+            // TODO: Check if NMI is supposed to be able to fire during this push
+            PushWord(Registers.PC);
+            Registers.PC = 0x66;
+        }
 
+        private void HandleINT()
+        {
+            // TODO: Check if INT is supposed to be able to fire during this push and other memory operations
+            var opcode = AcknowledgeInterrupt();
+
+            if (Registers.InterruptMode == Z80InterruptMode.External)
+            {
+                var instr = InstructionDecoder.DecodeNextInstruction(this, out var instrBytes, opcode);
+                instr.Execute(this, instrBytes);
+            }
+            else if (Registers.InterruptMode == Z80InterruptMode.FixedAddress)
+            {
+                PushWord(Registers.PC);
+                Registers.PC = 0x38;
+            }
+            else if (Registers.InterruptMode == Z80InterruptMode.Vectorized)
+            {
+                var upper = Registers.I;
+                var lower = opcode;
+                var addr = Utilities.LETo16Bit(lower, upper);
+                PushWord(Registers.PC);
+                var jumpAddr = ReadWord(addr);
+                Registers.PC = jumpAddr;
+            }
+        }
+
+        private byte AcknowledgeInterrupt()
+        {
+            // TODO: Check the timing for this
+            ControlLines.SystemClock.Tick();
+
+            ControlLines.AddressBus.WriteValue(this, Registers.PC);
+            ControlLines.RFSH.WriteValue(this, TristateWireState.LogicHigh);
+            ControlLines.IORQ.WriteValue(this, TristateWireState.LogicLow);
+            ControlLines.RD.WriteValue(this, TristateWireState.LogicLow);
+            ControlLines.M1.WriteValue(this, TristateWireState.LogicLow);
+            Registers.PC++;
+            ControlLines.SystemClock.Tick();
+
+            WaitForMemory();
+
+            ControlLines.SystemClock.TickMultiple(2);
+
+            var opcode = ControlLines.DataBus.Value;
+
+            RefreshMemory();
+
+            return opcode;
         }
 
         private void PreMachineCycle()
         {
 
+        }
+
+        private void PostMachineCycle()
+        {
+            if (ControlLines.BUSREQ.Value == TristateWireState.LogicLow)
+            {
+                ControlLines.MREQ.WriteValue(this, TristateWireState.HighImpedance);
+                ControlLines.IORQ.WriteValue(this, TristateWireState.HighImpedance);
+                ControlLines.RD.WriteValue(this, TristateWireState.HighImpedance);
+                ControlLines.WR.WriteValue(this, TristateWireState.HighImpedance);
+                ControlLines.RFSH.WriteValue(this, TristateWireState.HighImpedance);
+                ControlLines.BUSACK.WriteValue(this, TristateWireState.LogicLow);
+
+                while (ControlLines.BUSREQ.Value == TristateWireState.LogicLow)
+                {
+                    ControlLines.SystemClock.Tick();
+                }
+
+                ControlLines.BUSACK.WriteValue(this, TristateWireState.HighImpedance);
+                // TODO: Handle BUSREQ/BUSACK completely (reset wires? etc)
+            }
+
+            if (ControlLines.NMI.Value == TristateWireState.LogicLow)
+            {
+                HandleNMI();
+            }
         }
 
         public byte FetchOpcode()
