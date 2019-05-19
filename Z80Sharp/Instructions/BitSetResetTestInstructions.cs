@@ -110,13 +110,11 @@ namespace Z80Sharp.Instructions
             cpu.ControlLines.SystemClock.TickMultiple(2);
 
             var bit = instruction[1].ExtractBits(3, 3);
-            var val = cpu.ReadMemory(cpu.Registers.IX.CalculateIndex(instruction[2]));
+            var val = cpu.ReadMemory(cpu.Registers.IX.CalculateIndex(instruction[2]), 1);
 
             cpu.Registers.Zero = !val.GetBit(bit);
             cpu.Registers.HalfCarry = true;
             cpu.Registers.Subtract = false;
-
-            cpu.ControlLines.SystemClock.Tick();
 
             return 20;
         }
@@ -134,13 +132,11 @@ namespace Z80Sharp.Instructions
             cpu.ControlLines.SystemClock.TickMultiple(2);
 
             var bit = instruction[1].ExtractBits(3, 3);
-            var val = cpu.ReadMemory(cpu.Registers.IY.CalculateIndex(instruction[2]));
+            var val = cpu.ReadMemory(cpu.Registers.IY.CalculateIndex(instruction[2]), 1);
 
             cpu.Registers.Zero = !val.GetBit(bit);
             cpu.Registers.HalfCarry = true;
             cpu.Registers.Subtract = false;
-
-            cpu.ControlLines.SystemClock.Tick();
 
             return 20;
         }
@@ -223,7 +219,7 @@ namespace Z80Sharp.Instructions
         public static int SET_b_HL_mem(IZ80CPU cpu, byte[] instruction)
         {
             var bit = instruction[1].ExtractBits(3, 3);
-            var val = cpu.ReadMemory(cpu.Registers.HL);
+            var val = cpu.ReadMemory(cpu.Registers.HL, 1);
             val = val.SetBit(true, bit);
             cpu.WriteMemory(cpu.Registers.HL, val);
 
@@ -244,10 +240,9 @@ namespace Z80Sharp.Instructions
 
             var bit = instruction[1].ExtractBits(3, 3);
             var addr = cpu.Registers.IX.CalculateIndex(instruction[2]);
-            var val = cpu.ReadMemory(addr);
+            var val = cpu.ReadMemory(addr, 1);
             val = val.SetBit(true, bit);
-
-            cpu.ControlLines.SystemClock.Tick();
+            
             cpu.WriteMemory(addr, val);
 
             return 23;
@@ -267,10 +262,9 @@ namespace Z80Sharp.Instructions
 
             var bit = instruction[1].ExtractBits(3, 3);
             var addr = cpu.Registers.IY.CalculateIndex(instruction[2]);
-            var val = cpu.ReadMemory(addr);
+            var val = cpu.ReadMemory(addr, 1);
             val = val.SetBit(true, bit);
-
-            cpu.ControlLines.SystemClock.Tick();
+            
             cpu.WriteMemory(addr, val);
 
             return 23;
@@ -354,7 +348,7 @@ namespace Z80Sharp.Instructions
         public static int RES_b_HL_mem(IZ80CPU cpu, byte[] instruction)
         {
             var bit = instruction[1].ExtractBits(3, 3);
-            var val = cpu.ReadMemory(cpu.Registers.HL);
+            var val = cpu.ReadMemory(cpu.Registers.HL, 1);
             val = val.SetBit(false, bit);
             cpu.WriteMemory(cpu.Registers.HL, val);
 
@@ -375,10 +369,9 @@ namespace Z80Sharp.Instructions
 
             var bit = instruction[1].ExtractBits(3, 3);
             var addr = cpu.Registers.IX.CalculateIndex(instruction[2]);
-            var val = cpu.ReadMemory(addr);
+            var val = cpu.ReadMemory(addr, 1);
             val = val.SetBit(false, bit);
-
-            cpu.ControlLines.SystemClock.Tick();
+            
             cpu.WriteMemory(addr, val);
 
             return 23;
@@ -398,10 +391,9 @@ namespace Z80Sharp.Instructions
 
             var bit = instruction[1].ExtractBits(3, 3);
             var addr = cpu.Registers.IY.CalculateIndex(instruction[2]);
-            var val = cpu.ReadMemory(addr);
+            var val = cpu.ReadMemory(addr, 1);
             val = val.SetBit(false, bit);
-
-            cpu.ControlLines.SystemClock.Tick();
+            
             cpu.WriteMemory(addr, val);
 
             return 23;

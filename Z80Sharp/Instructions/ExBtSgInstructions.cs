@@ -37,14 +37,12 @@ namespace Z80Sharp.Instructions
         public static int EX_SP_mem_HL(IZ80CPU cpu, byte[] instruction)
         {
             var lower = cpu.ReadMemory(cpu.Registers.SP);
-            var upper = cpu.ReadMemory((ushort) (cpu.Registers.SP + 1));
-            cpu.ControlLines.SystemClock.Tick();
+            var upper = cpu.ReadMemory((ushort) (cpu.Registers.SP + 1), waitAfter: 1);
 
             cpu.WriteMemory(cpu.Registers.SP, cpu.Registers.L);
             cpu.Registers.L = lower;
-            cpu.WriteMemory((ushort)(cpu.Registers.SP + 1), cpu.Registers.H);
+            cpu.WriteMemory((ushort)(cpu.Registers.SP + 1), cpu.Registers.H, waitAfter: 2);
             cpu.Registers.H = upper;
-            cpu.ControlLines.SystemClock.TickMultiple(2);
 
             return 19;
         }
@@ -53,14 +51,12 @@ namespace Z80Sharp.Instructions
         public static int EX_SP_mem_IX(IZ80CPU cpu, byte[] instruction)
         {
             var lower = cpu.ReadMemory(cpu.Registers.SP);
-            var upper = cpu.ReadMemory((ushort)(cpu.Registers.SP + 1));
-            cpu.ControlLines.SystemClock.Tick();
+            var upper = cpu.ReadMemory((ushort)(cpu.Registers.SP + 1), waitAfter: 1);
 
             cpu.WriteMemory(cpu.Registers.SP, cpu.Registers.IXLower);
             cpu.Registers.IXLower = lower;
-            cpu.WriteMemory((ushort)(cpu.Registers.SP + 1), cpu.Registers.IXUpper);
+            cpu.WriteMemory((ushort)(cpu.Registers.SP + 1), cpu.Registers.IXUpper, waitAfter: 2);
             cpu.Registers.IXUpper = upper;
-            cpu.ControlLines.SystemClock.TickMultiple(2);
 
             return 23;
         }
@@ -69,14 +65,12 @@ namespace Z80Sharp.Instructions
         public static int EX_SP_mem_IY(IZ80CPU cpu, byte[] instruction)
         {
             var lower = cpu.ReadMemory(cpu.Registers.SP);
-            var upper = cpu.ReadMemory((ushort)(cpu.Registers.SP + 1));
-            cpu.ControlLines.SystemClock.Tick();
+            var upper = cpu.ReadMemory((ushort)(cpu.Registers.SP + 1), waitAfter: 1);
 
             cpu.WriteMemory(cpu.Registers.SP, cpu.Registers.IYLower);
             cpu.Registers.IYLower = lower;
-            cpu.WriteMemory((ushort)(cpu.Registers.SP + 1), cpu.Registers.IYUpper);
+            cpu.WriteMemory((ushort)(cpu.Registers.SP + 1), cpu.Registers.IYUpper, waitAfter: 2);
             cpu.Registers.IYUpper = upper;
-            cpu.ControlLines.SystemClock.TickMultiple(2);
 
             return 23;
         }
@@ -89,15 +83,14 @@ namespace Z80Sharp.Instructions
         public static int LDI(IZ80CPU cpu, byte[] instruction)
         {
             var data = cpu.ReadMemory(cpu.Registers.HL);
-            cpu.WriteMemory(cpu.Registers.DE, data);
+            cpu.WriteMemory(cpu.Registers.DE, data, waitAfter: 2);
             cpu.Registers.HL++;
             cpu.Registers.DE++;
             cpu.Registers.BC--;
             cpu.Registers.HalfCarry = false;
             cpu.Registers.ParityOrOverflow = cpu.Registers.BC != 0;
             cpu.Registers.Subtract = false;
-
-            cpu.ControlLines.SystemClock.TickMultiple(2);
+            
             return 16;
         }
 
@@ -105,7 +98,7 @@ namespace Z80Sharp.Instructions
         public static int LDIR(IZ80CPU cpu, byte[] instruction)
         {
             var data = cpu.ReadMemory(cpu.Registers.HL);
-            cpu.WriteMemory(cpu.Registers.DE, data);
+            cpu.WriteMemory(cpu.Registers.DE, data, waitAfter: 2);
             cpu.Registers.HL++;
             cpu.Registers.DE++;
             cpu.Registers.BC--;
@@ -113,12 +106,10 @@ namespace Z80Sharp.Instructions
             cpu.Registers.ParityOrOverflow = cpu.Registers.BC != 0;
             cpu.Registers.Subtract = false;
 
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-
             if (cpu.Registers.BC != 0) return 16;
 
             cpu.Registers.PC -= 2;
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
             return 21;
         }
 
@@ -126,15 +117,15 @@ namespace Z80Sharp.Instructions
         public static int LDD(IZ80CPU cpu, byte[] instruction)
         {
             var data = cpu.ReadMemory(cpu.Registers.HL);
-            cpu.WriteMemory(cpu.Registers.DE, data);
+            cpu.WriteMemory(cpu.Registers.DE, data, waitAfter: 2);
             cpu.Registers.HL--;
             cpu.Registers.DE--;
             cpu.Registers.BC--;
             cpu.Registers.HalfCarry = false;
             cpu.Registers.ParityOrOverflow = cpu.Registers.BC != 0;
             cpu.Registers.Subtract = false;
-
-            cpu.ControlLines.SystemClock.TickMultiple(2);
+            
+            cpu.InsertWaitMachineCycle(5);
             return 16;
         }
 
@@ -142,7 +133,7 @@ namespace Z80Sharp.Instructions
         public static int LDDR(IZ80CPU cpu, byte[] instruction)
         {
             var data = cpu.ReadMemory(cpu.Registers.HL);
-            cpu.WriteMemory(cpu.Registers.DE, data);
+            cpu.WriteMemory(cpu.Registers.DE, data, waitAfter: 2);
             cpu.Registers.HL--;
             cpu.Registers.DE--;
             cpu.Registers.BC--;
@@ -150,12 +141,10 @@ namespace Z80Sharp.Instructions
             cpu.Registers.ParityOrOverflow = cpu.Registers.BC != 0;
             cpu.Registers.Subtract = false;
 
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-
             if (cpu.Registers.BC != 0) return 16;
 
             cpu.Registers.PC -= 2;
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
             return 21;
         }
 
@@ -177,7 +166,7 @@ namespace Z80Sharp.Instructions
             cpu.Registers.Subtract = true;
             cpu.Registers.ParityOrOverflow = cpu.Registers.BC != 0;
 
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
             return 16;
         }
 
@@ -195,12 +184,12 @@ namespace Z80Sharp.Instructions
             cpu.Registers.Subtract = true;
             cpu.Registers.ParityOrOverflow = cpu.Registers.BC != 0;
 
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
 
             if (cpu.Registers.Zero || cpu.Registers.BC == 0) return 16;
 
             cpu.Registers.PC -= 2;
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
             return 21;
         }
 
@@ -218,7 +207,7 @@ namespace Z80Sharp.Instructions
             cpu.Registers.Subtract = true;
             cpu.Registers.ParityOrOverflow = cpu.Registers.BC != 0;
 
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
             return 16;
         }
 
@@ -236,12 +225,12 @@ namespace Z80Sharp.Instructions
             cpu.Registers.Subtract = true;
             cpu.Registers.ParityOrOverflow = cpu.Registers.BC != 0;
 
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
 
             if (cpu.Registers.Zero || cpu.Registers.BC == 0) return 16;
 
             cpu.Registers.PC -= 2;
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
             return 21;
         }
 

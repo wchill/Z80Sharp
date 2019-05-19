@@ -108,7 +108,7 @@ namespace Z80Sharp.Instructions
         [IXInstruction("LD L, (IX+d)", 3, 0xDD, 0x6E)]
         public static int LD_r_IX_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
 
             var dst = instruction[0].ExtractBits(3, 3);
             var data = cpu.ReadMemory(cpu.Registers.IX.CalculateIndex(instruction[2]));
@@ -127,7 +127,7 @@ namespace Z80Sharp.Instructions
         [IYInstruction("LD L, (IY+d)", 3, 0xFD, 0x6E)]
         public static int LD_r_IY_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
 
             var dst = instruction[0].ExtractBits(3, 3);
             var data = cpu.ReadMemory(cpu.Registers.IY.CalculateIndex(instruction[2]));
@@ -162,7 +162,7 @@ namespace Z80Sharp.Instructions
         [IXInstruction("LD (IX+d), L", 3, 0xDD, 0x75)]
         public static int LD_IX_plus_d_mem_r(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
 
             var src = instruction[1].ExtractBits(0, 3);
             var data = ReadByteFromCpuRegister(cpu, src);
@@ -181,7 +181,7 @@ namespace Z80Sharp.Instructions
         [IYInstruction("LD (IY+d), L", 3, 0xFD, 0x75)]
         public static int LD_IY_plus_d_mem_r(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
 
             var src = instruction[1].ExtractBits(0, 3);
             var data = ReadByteFromCpuRegister(cpu, src);
@@ -264,6 +264,8 @@ namespace Z80Sharp.Instructions
         [ExtendedInstruction("LD A, I", 1, 0xED, 0x57)]
         public static int LD_A_I(IZ80CPU cpu, byte[] instruction)
         {
+            cpu.ControlLines.SystemClock.Tick();
+
             cpu.Registers.A = cpu.Registers.I;
             cpu.Registers.Sign = cpu.Registers.A.IsNegative();
             cpu.Registers.Zero = cpu.Registers.A == 0;
@@ -273,14 +275,14 @@ namespace Z80Sharp.Instructions
             cpu.Registers.ParityOrOverflow = cpu.Registers.IFF2;
             cpu.Registers.Subtract = false;
 
-            cpu.ControlLines.SystemClock.Tick();
-
             return 9;
         }
 
         [ExtendedInstruction("LD A, R", 1, 0xED, 0x5F)]
         public static int LD_A_R(IZ80CPU cpu, byte[] instruction)
         {
+            cpu.ControlLines.SystemClock.Tick();
+
             cpu.Registers.A = cpu.Registers.R;
             cpu.Registers.Sign = cpu.Registers.A.IsNegative();
             cpu.Registers.Zero = cpu.Registers.A == 0;
@@ -290,16 +292,15 @@ namespace Z80Sharp.Instructions
             cpu.Registers.ParityOrOverflow = cpu.Registers.IFF2;
             cpu.Registers.Subtract = false;
 
-            cpu.ControlLines.SystemClock.Tick();
-
             return 9;
         }
 
         [ExtendedInstruction("LD I, A", 1, 0xED, 0x47)]
         public static int LD_I_A(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.Registers.I = cpu.Registers.A;
             cpu.ControlLines.SystemClock.Tick();
+
+            cpu.Registers.I = cpu.Registers.A;
 
             return 9;
         }
@@ -307,8 +308,9 @@ namespace Z80Sharp.Instructions
         [ExtendedInstruction("LD R, A", 1, 0xED, 0x4F)]
         public static int LD_R_A(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.Registers.R = cpu.Registers.A;
             cpu.ControlLines.SystemClock.Tick();
+
+            cpu.Registers.R = cpu.Registers.A;
 
             return 9;
         }
@@ -430,27 +432,27 @@ namespace Z80Sharp.Instructions
         [MainInstruction("LD SP, HL", 1, 0xF9)]
         public static int LD_SP_HL(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.Registers.SP = cpu.Registers.HL;
-
             cpu.ControlLines.SystemClock.TickMultiple(2);
+
+            cpu.Registers.SP = cpu.Registers.HL;
             return 6;
         }
 
         [IXInstruction("LD SP, IX", 2, 0xDD, 0xF9)]
         public static int LD_SP_IX(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.Registers.SP = cpu.Registers.IX;
-
             cpu.ControlLines.SystemClock.TickMultiple(2);
+
+            cpu.Registers.SP = cpu.Registers.IX;
             return 10;
         }
 
         [IYInstruction("LD SP, IY", 2, 0xFD, 0xF9)]
         public static int LD_SP_IY(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.Registers.SP = cpu.Registers.IY;
-
             cpu.ControlLines.SystemClock.TickMultiple(2);
+
+            cpu.Registers.SP = cpu.Registers.IY;
             return 10;
         }
         #endregion
@@ -465,9 +467,8 @@ namespace Z80Sharp.Instructions
         {
             var src = instruction[0].ExtractBits(4, 2);
             var data = ReadWordFromCpuRegister_BC_DE_HL_AF(cpu, src);
-
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            cpu.PushWord(data);
+            
+            cpu.PushWord(data, 2);
 
             return 11;
         }
@@ -475,8 +476,7 @@ namespace Z80Sharp.Instructions
         [IXInstruction("PUSH IX", 2, 0xDD, 0xE5)]
         public static int PUSH_IX(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            cpu.PushWord(cpu.Registers.IX);
+            cpu.PushWord(cpu.Registers.IX, 2);
 
             return 15;
         }
@@ -484,8 +484,7 @@ namespace Z80Sharp.Instructions
         [IYInstruction("PUSH IY", 2, 0xFD, 0xE5)]
         public static int PUSH_IY(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            cpu.PushWord(cpu.Registers.IY);
+            cpu.PushWord(cpu.Registers.IY, 2);
 
             return 15;
         }

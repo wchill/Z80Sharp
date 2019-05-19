@@ -123,8 +123,8 @@ namespace Z80Sharp.Instructions
             {
                 cpu.Registers.PC += (ushort) offset;
             }
-            
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+
+            cpu.InsertWaitMachineCycle(5);
             return 12;
         }
 
@@ -160,7 +160,7 @@ namespace Z80Sharp.Instructions
                 cpu.Registers.PC += (ushort)offset;
             }
 
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
             return 12;
 
         }
@@ -208,7 +208,7 @@ namespace Z80Sharp.Instructions
                 cpu.Registers.PC += (ushort)offset;
             }
 
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
             return 13;
         }
 
@@ -219,8 +219,7 @@ namespace Z80Sharp.Instructions
         [MainInstruction("CALL nn", 3, 0xCD)]
         public static int CALL_nn(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.Tick();
-            cpu.PushWord(cpu.Registers.PC);
+            cpu.PushWord(cpu.Registers.PC, 1);
             cpu.Registers.PC = Utilities.LETo16Bit(instruction[1], instruction[2]);
 
             return 17;
@@ -253,9 +252,8 @@ namespace Z80Sharp.Instructions
             }
 
             if (!shouldJump) return 10;
-
-            cpu.ControlLines.SystemClock.Tick();
-            cpu.PushWord(cpu.Registers.PC);
+            
+            cpu.PushWord(cpu.Registers.PC, 1);
             cpu.Registers.PC = Utilities.LETo16Bit(instruction[1], instruction[2]);
 
             return 17;

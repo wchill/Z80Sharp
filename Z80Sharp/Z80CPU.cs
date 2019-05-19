@@ -29,8 +29,20 @@ namespace Z80Sharp
             }
         }
 
+        private void PostMachineCycle()
+        {
+
+        }
+
+        private void PreMachineCycle()
+        {
+
+        }
+
         public byte FetchOpcode()
         {
+            PreMachineCycle();
+
             ControlLines.AddressBus.WriteValue(this, Registers.PC);
             ControlLines.RFSH.WriteValue(this, TristateWireState.LogicHigh);
             ControlLines.MREQ.WriteValue(this, TristateWireState.LogicLow);
@@ -44,11 +56,19 @@ namespace Z80Sharp
             var opcode = ControlLines.DataBus.Value;
 
             RefreshMemory();
+            PostMachineCycle();
 
             return opcode;
         }
 
-        public void RefreshMemory()
+        public void InsertWaitMachineCycle(int numCycles)
+        {
+            PreMachineCycle();
+            ControlLines.SystemClock.TickMultiple(numCycles);
+            PostMachineCycle();
+        }
+
+        private void RefreshMemory()
         {
             Registers.R++;
             var refreshAddr = Utilities.LETo16Bit((byte)(Registers.R & 0x7F), Registers.I);
@@ -67,8 +87,11 @@ namespace Z80Sharp
             ControlLines.SystemClock.Tick();
         }
 
-        public byte ReadMemory(ushort address)
+        public byte ReadMemory(ushort address, int waitBefore = 0, int waitAfter = 0)
         {
+            PreMachineCycle();
+            ControlLines.SystemClock.TickMultiple(waitBefore);
+
             ControlLines.AddressBus.WriteValue(this, address);
             ControlLines.MREQ.WriteValue(this, TristateWireState.LogicLow);
             ControlLines.RD.WriteValue(this, TristateWireState.LogicLow);
@@ -79,6 +102,10 @@ namespace Z80Sharp
             ControlLines.MREQ.WriteValue(this, TristateWireState.LogicHigh);
             ControlLines.RD.WriteValue(this, TristateWireState.LogicHigh);
             ControlLines.SystemClock.Tick();
+
+            ControlLines.SystemClock.TickMultiple(waitAfter);
+            PostMachineCycle();
+
             return ControlLines.DataBus.Value;
         }
 
@@ -86,6 +113,7 @@ namespace Z80Sharp
         {
             var lower = ReadMemory(address);
             var upper = ReadMemory((ushort) (address + 1));
+
             return Utilities.LETo16Bit(lower, upper);
         }
 
@@ -93,11 +121,15 @@ namespace Z80Sharp
         {
             var data = ReadMemory(Registers.SP);
             Registers.SP++;
+
             return data;
         }
 
-        public void WriteMemory(ushort address, byte data)
+        public void WriteMemory(ushort address, byte data, int waitBefore = 0, int waitAfter = 0)
         {
+            PreMachineCycle();
+            ControlLines.SystemClock.TickMultiple(waitBefore);
+
             ControlLines.AddressBus.WriteValue(this, address);
             ControlLines.MREQ.WriteValue(this, TristateWireState.LogicLow);
             ControlLines.DataBus.WriteValue(this, data);
@@ -109,6 +141,9 @@ namespace Z80Sharp
             ControlLines.MREQ.WriteValue(this, TristateWireState.LogicHigh);
             ControlLines.WR.WriteValue(this, TristateWireState.LogicHigh);
             ControlLines.SystemClock.Tick();
+
+            ControlLines.SystemClock.TickMultiple(waitAfter);
+            PostMachineCycle();
         }
 
         public void WriteWord(ushort address, ushort data)
@@ -118,16 +153,19 @@ namespace Z80Sharp
             WriteMemory(address, data.GetUpperByte());
         }
 
-        public void PushWord(ushort data)
+        public void PushWord(ushort data, int waitBefore = 0)
         {
             Registers.SP--;
-            WriteMemory(Registers.SP, data.GetUpperByte());
+            WriteMemory(Registers.SP, data.GetUpperByte(), waitBefore);
             Registers.SP--;
             WriteMemory(Registers.SP, data.GetLowerByte());
         }
 
-        public byte ReadFromPort(ushort address)
+        public byte ReadFromPort(ushort address, int waitBefore = 0)
         {
+            PreMachineCycle();
+            ControlLines.SystemClock.TickMultiple(waitBefore);
+
             ControlLines.AddressBus.WriteValue(this, address);
             ControlLines.IORQ.WriteValue(this, TristateWireState.LogicHigh);
             ControlLines.RD.WriteValue(this, TristateWireState.LogicHigh);
@@ -144,12 +182,16 @@ namespace Z80Sharp
             ControlLines.IORQ.WriteValue(this, TristateWireState.LogicHigh);
             ControlLines.RD.WriteValue(this, TristateWireState.LogicHigh);
             ControlLines.SystemClock.Tick();
+            
+            PostMachineCycle();
 
             return data;
         }
 
         public void WriteToPort(ushort address, byte data)
         {
+            PreMachineCycle();
+
             ControlLines.AddressBus.WriteValue(this, address);
             ControlLines.DataBus.WriteValue(this, data);
             ControlLines.IORQ.WriteValue(this, TristateWireState.LogicHigh);
@@ -165,6 +207,8 @@ namespace Z80Sharp
             ControlLines.IORQ.WriteValue(this, TristateWireState.LogicHigh);
             ControlLines.WR.WriteValue(this, TristateWireState.LogicHigh);
             ControlLines.SystemClock.Tick();
+            
+            PostMachineCycle();
         }
 
         private void WaitForMemory()

@@ -47,22 +47,20 @@ namespace Z80Sharp.Instructions
         [IXInstruction("ADD A, (IX+d)", 3, 0xDD, 0x86)]
         public static int ADD_A_IX_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            var data = cpu.ReadMemory(cpu.Registers.IX.CalculateIndex(instruction[2]));
+            var data = cpu.ReadMemory(cpu.Registers.IX.CalculateIndex(instruction[2]), 2);
             AddBytes(cpu, cpu.Registers.A, data);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
             return 19;
         }
 
         [IYInstruction("ADD A, (IY+d)", 3, 0xFD, 0x86)]
         public static int ADD_A_IY_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            var data = cpu.ReadMemory(cpu.Registers.IY.CalculateIndex(instruction[2]));
+            var data = cpu.ReadMemory(cpu.Registers.IY.CalculateIndex(instruction[2]), 2);
             AddBytes(cpu, cpu.Registers.A, data);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
             return 19;
         }
 
@@ -103,22 +101,20 @@ namespace Z80Sharp.Instructions
         [IXInstruction("ADC A, (IX+d)", 3, 0xDD, 0x8E)]
         public static int ADC_A_IX_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            var data = cpu.ReadMemory(cpu.Registers.IX.CalculateIndex(instruction[2]));
+            var data = cpu.ReadMemory(cpu.Registers.IX.CalculateIndex(instruction[2]), 2);
             AddBytes(cpu, cpu.Registers.A, data, true);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
             return 19;
         }
 
         [IYInstruction("ADC A, (IY+d)", 3, 0xFD, 0x8E)]
         public static int ADC_A_IY_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            var data = cpu.ReadMemory(cpu.Registers.IY.CalculateIndex(instruction[2]));
+            var data = cpu.ReadMemory(cpu.Registers.IY.CalculateIndex(instruction[2]), 2);
             AddBytes(cpu, cpu.Registers.A, data, true);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
             return 19;
         }
         #endregion
@@ -161,22 +157,20 @@ namespace Z80Sharp.Instructions
         [IXInstruction("SUB A, (IX+d)", 3, 0xDD, 0x96)]
         public static int SUB_A_IX_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            var data = cpu.ReadMemory(cpu.Registers.IX.CalculateIndex(instruction[2]));
+            var data = cpu.ReadMemory(cpu.Registers.IX.CalculateIndex(instruction[2]), 2);
             SubBytes(cpu, cpu.Registers.A, data);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
             return 19;
         }
 
         [IYInstruction("SUB A, (IY+d)", 3, 0xFD, 0x96)]
         public static int SUB_A_IY_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            var data = cpu.ReadMemory(cpu.Registers.IY.CalculateIndex(instruction[2]));
+            var data = cpu.ReadMemory(cpu.Registers.IY.CalculateIndex(instruction[2]), 2);
             SubBytes(cpu, cpu.Registers.A, data);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
             return 19;
         }
 
@@ -217,22 +211,20 @@ namespace Z80Sharp.Instructions
         [IXInstruction("SBC A, (IX+d)", 3, 0xDD, 0x9E)]
         public static int SBC_A_IX_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            var data = cpu.ReadMemory(cpu.Registers.IX.CalculateIndex(instruction[2]));
+            var data = cpu.ReadMemory(cpu.Registers.IX.CalculateIndex(instruction[2]), 2);
             SubBytes(cpu, cpu.Registers.A, data, true);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
             return 19;
         }
 
         [IYInstruction("SBC A, (IY+d)", 3, 0xFD, 0x9E)]
         public static int SBC_A_IY_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            var data = cpu.ReadMemory(cpu.Registers.IY.CalculateIndex(instruction[2]));
+            var data = cpu.ReadMemory(cpu.Registers.IY.CalculateIndex(instruction[2]), 2);
             SubBytes(cpu, cpu.Registers.A, data, true);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
             return 19;
         }
         #endregion
@@ -275,22 +267,20 @@ namespace Z80Sharp.Instructions
         [IXInstruction("AND (IX+d)", 3, 0xDD, 0xA6)]
         public static int AND_IX_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            var data = cpu.ReadMemory(cpu.Registers.IX.CalculateIndex(instruction[2]));
+            var data = cpu.ReadMemory(cpu.Registers.IX.CalculateIndex(instruction[2]), 2);
             LogicalAndBytes(cpu, data);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
             return 19;
         }
 
         [IYInstruction("AND (IY+d)", 3, 0xFD, 0xA6)]
         public static int AND_IY_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            var data = cpu.ReadMemory(cpu.Registers.IY.CalculateIndex(instruction[2]));
+            var data = cpu.ReadMemory(cpu.Registers.IY.CalculateIndex(instruction[2]), 2);
             LogicalAndBytes(cpu, data);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
             return 19;
         }
         #endregion
@@ -333,22 +323,20 @@ namespace Z80Sharp.Instructions
         [IXInstruction("OR (IX+d)", 3, 0xDD, 0xB6)]
         public static int OR_IX_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            var data = cpu.ReadMemory(cpu.Registers.IX.CalculateIndex(instruction[2]));
+            var data = cpu.ReadMemory(cpu.Registers.IX.CalculateIndex(instruction[2]), 2);
             LogicalOrBytes(cpu, data);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
             return 19;
         }
 
         [IYInstruction("OR (IY+d)", 3, 0xFD, 0xB6)]
         public static int OR_IY_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            var data = cpu.ReadMemory(cpu.Registers.IY.CalculateIndex(instruction[2]));
+            var data = cpu.ReadMemory(cpu.Registers.IY.CalculateIndex(instruction[2]), 2);
             LogicalOrBytes(cpu, data);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
             return 19;
         }
         #endregion
@@ -391,22 +379,20 @@ namespace Z80Sharp.Instructions
         [IXInstruction("XOR (IX+d)", 3, 0xDD, 0xAE)]
         public static int XOR_IX_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            var data = cpu.ReadMemory(cpu.Registers.IX.CalculateIndex(instruction[2]));
+            var data = cpu.ReadMemory(cpu.Registers.IX.CalculateIndex(instruction[2]), 2);
             LogicalXorBytes(cpu, data);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
             return 19;
         }
 
         [IYInstruction("XOR (IY+d)", 3, 0xFD, 0xAE)]
         public static int XOR_IY_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            var data = cpu.ReadMemory(cpu.Registers.IY.CalculateIndex(instruction[2]));
+            var data = cpu.ReadMemory(cpu.Registers.IY.CalculateIndex(instruction[2]), 2);
             LogicalXorBytes(cpu, data);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
             return 19;
         }
         #endregion
@@ -449,22 +435,20 @@ namespace Z80Sharp.Instructions
         [IXInstruction("CP (IX+d)", 3, 0xDD, 0xBE)]
         public static int CP_IX_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            var data = cpu.ReadMemory(cpu.Registers.IX.CalculateIndex(instruction[2]));
+            var data = cpu.ReadMemory(cpu.Registers.IX.CalculateIndex(instruction[2]), 2);
             CompareBytes(cpu, data);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
             return 19;
         }
 
         [IYInstruction("CP (IY+d)", 3, 0xFD, 0xBE)]
         public static int CP_IY_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(2);
-            var data = cpu.ReadMemory(cpu.Registers.IY.CalculateIndex(instruction[2]));
+            var data = cpu.ReadMemory(cpu.Registers.IY.CalculateIndex(instruction[2]), 2);
             CompareBytes(cpu, data);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
             return 19;
         }
         #endregion
@@ -501,8 +485,7 @@ namespace Z80Sharp.Instructions
         [MainInstruction("INC (HL)", 1, 0x34)]
         public static int INC_HL_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.Tick();
-            var data = cpu.ReadMemory(cpu.Registers.HL);
+            var data = cpu.ReadMemory(cpu.Registers.HL, 1);
             data++;
             cpu.WriteMemory(cpu.Registers.HL, data);
 
@@ -514,13 +497,12 @@ namespace Z80Sharp.Instructions
         [IXInstruction("INC (IX+d)", 3, 0xDD, 0x34)]
         public static int INC_IX_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
 
             var addr = cpu.Registers.IX.CalculateIndex(instruction[2]);
             var data = cpu.ReadMemory(addr);
             data++;
-            cpu.ControlLines.SystemClock.Tick();
-            cpu.WriteMemory(addr, data);
+            cpu.WriteMemory(addr, data, 1);
             
             IncrementByteSetConditionBits(cpu, data);
 
@@ -530,13 +512,12 @@ namespace Z80Sharp.Instructions
         [IYInstruction("INC (IY+d)", 3, 0xFD, 0x34)]
         public static int INC_IY_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
 
             var addr = cpu.Registers.IY.CalculateIndex(instruction[2]);
             var data = cpu.ReadMemory(addr);
             data++;
-            cpu.ControlLines.SystemClock.Tick();
-            cpu.WriteMemory(addr, data);
+            cpu.WriteMemory(addr, data, 1);
 
             IncrementByteSetConditionBits(cpu, data);
 
@@ -574,8 +555,7 @@ namespace Z80Sharp.Instructions
         [MainInstruction("DEC (HL)", 1, 0x35)]
         public static int DEC_HL_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.Tick();
-            var data = cpu.ReadMemory(cpu.Registers.HL);
+            var data = cpu.ReadMemory(cpu.Registers.HL, 1);
             data--;
             cpu.WriteMemory(cpu.Registers.HL, data);
 
@@ -587,13 +567,12 @@ namespace Z80Sharp.Instructions
         [IXInstruction("DEC (IX+d)", 3, 0xDD, 0x35)]
         public static int DEC_IX_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
 
             var addr = cpu.Registers.IX.CalculateIndex(instruction[2]);
             var data = cpu.ReadMemory(addr);
             data--;
-            cpu.ControlLines.SystemClock.Tick();
-            cpu.WriteMemory(addr, data);
+            cpu.WriteMemory(addr, data, 1);
 
             DecrementByteSetConditionBits(cpu, data);
 
@@ -603,13 +582,12 @@ namespace Z80Sharp.Instructions
         [IYInstruction("DEC (IY+d)", 3, 0xFD, 0x35)]
         public static int DEC_IY_plus_d_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
 
             var addr = cpu.Registers.IY.CalculateIndex(instruction[2]);
             var data = cpu.ReadMemory(addr);
             data--;
-            cpu.ControlLines.SystemClock.Tick();
-            cpu.WriteMemory(addr, data);
+            cpu.WriteMemory(addr, data, 1);
 
             DecrementByteSetConditionBits(cpu, data);
 
@@ -721,7 +699,7 @@ namespace Z80Sharp.Instructions
             var src = instruction[0].ExtractBits(4, 2);
             var data = ReadWordFromCpuRegister_BC_DE_HL_SP(cpu, src);
 
-            cpu.ControlLines.SystemClock.TickMultiple(4);
+            cpu.InsertWaitMachineCycle(4);
 
             var upperReg = data.GetUpperByte();
             var upperHL = cpu.Registers.H;
@@ -730,7 +708,7 @@ namespace Z80Sharp.Instructions
             cpu.Registers.Subtract = false;
             cpu.Registers.Carry = upperHL.WillCarry(upperReg);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
 
             return 11;
         }
@@ -744,11 +722,11 @@ namespace Z80Sharp.Instructions
             var src = instruction[0].ExtractBits(4, 2);
             var data = ReadWordFromCpuRegister_BC_DE_HL_SP(cpu, src);
 
-            cpu.ControlLines.SystemClock.TickMultiple(4);
-            
+            cpu.InsertWaitMachineCycle(4);
+
             AddWordsWithCarryAndSetConditionBits(cpu, false, data);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
 
             return 15;
         }
@@ -762,11 +740,11 @@ namespace Z80Sharp.Instructions
             var src = instruction[0].ExtractBits(4, 2);
             var data = ReadWordFromCpuRegister_BC_DE_HL_SP(cpu, src);
 
-            cpu.ControlLines.SystemClock.TickMultiple(4);
+            cpu.InsertWaitMachineCycle(4);
 
             AddWordsWithCarryAndSetConditionBits(cpu, true, data);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
 
             return 15;
         }
@@ -777,7 +755,7 @@ namespace Z80Sharp.Instructions
         [IXInstruction("ADD IX, SP", 2, 0xDD, 0x39)]
         public static int ADD_IX_pp(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(4);
+            cpu.InsertWaitMachineCycle(4);
             ushort val = 0;
             switch (instruction[1])
             {
@@ -795,7 +773,7 @@ namespace Z80Sharp.Instructions
             cpu.Registers.Subtract = false;
             cpu.Registers.Carry = upperIX.WillCarry(upperReg);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
             return 15;
         }
 
@@ -805,7 +783,7 @@ namespace Z80Sharp.Instructions
         [IYInstruction("ADD IY, SP", 2, 0xFD, 0x39)]
         public static int ADD_IY_pp(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.TickMultiple(4);
+            cpu.InsertWaitMachineCycle(4);
             ushort val = 0;
             switch (instruction[1])
             {
@@ -823,7 +801,7 @@ namespace Z80Sharp.Instructions
             cpu.Registers.Subtract = false;
             cpu.Registers.Carry = upperIY.WillCarry(upperReg);
 
-            cpu.ControlLines.SystemClock.TickMultiple(3);
+            cpu.InsertWaitMachineCycle(3);
             return 15;
         }
 

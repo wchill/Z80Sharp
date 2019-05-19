@@ -65,8 +65,7 @@ namespace Z80Sharp.Instructions
         [BitInstruction("RLC (HL)", 2, 0xCB, 0x06)]
         public static int RLC_HL_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.Tick();
-            var data = cpu.ReadMemory(cpu.Registers.HL);
+            var data = cpu.ReadMemory(cpu.Registers.HL, 1);
 
             data = RotateByteLeft(cpu, data);
             cpu.Registers.Sign = data.IsNegative();
@@ -83,14 +82,13 @@ namespace Z80Sharp.Instructions
             cpu.ControlLines.SystemClock.TickMultiple(2);
 
             var addr = cpu.Registers.IX.CalculateIndex(instruction[2]);
-            var data = cpu.ReadMemory(addr);
+            var data = cpu.ReadMemory(addr, 1);
 
             data = RotateByteLeft(cpu, data);
             cpu.Registers.Sign = data.IsNegative();
             cpu.Registers.Zero = data == 0;
             cpu.Registers.ParityOrOverflow = data.IsParityEven();
-
-            cpu.ControlLines.SystemClock.Tick();
+            
             cpu.WriteMemory(addr, data);
 
             return 15;
@@ -102,14 +100,13 @@ namespace Z80Sharp.Instructions
             cpu.ControlLines.SystemClock.TickMultiple(2);
             
             var addr = cpu.Registers.IY.CalculateIndex(instruction[2]);
-            var data = cpu.ReadMemory(addr);
+            var data = cpu.ReadMemory(addr, 1);
 
             data = RotateByteLeft(cpu, data);
             cpu.Registers.Sign = data.IsNegative();
             cpu.Registers.Zero = data == 0;
             cpu.Registers.ParityOrOverflow = data.IsParityEven();
-
-            cpu.ControlLines.SystemClock.Tick();
+            
             cpu.WriteMemory(addr, data);
 
             return 15;
@@ -139,8 +136,7 @@ namespace Z80Sharp.Instructions
         [BitInstruction("RL (HL)", 2, 0xCB, 0x16)]
         public static int RL_HL_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.Tick();
-            var data = cpu.ReadMemory(cpu.Registers.HL);
+            var data = cpu.ReadMemory(cpu.Registers.HL, 1);
 
             data = RotateByteLeftThroughCarry(cpu, data);
             cpu.Registers.Sign = data.IsNegative();
@@ -157,14 +153,13 @@ namespace Z80Sharp.Instructions
             cpu.ControlLines.SystemClock.TickMultiple(2);
             
             var addr = cpu.Registers.IX.CalculateIndex(instruction[2]);
-            var data = cpu.ReadMemory(addr);
+            var data = cpu.ReadMemory(addr, 1);
 
             data = RotateByteLeftThroughCarry(cpu, data);
             cpu.Registers.Sign = data.IsNegative();
             cpu.Registers.Zero = data == 0;
             cpu.Registers.ParityOrOverflow = data.IsParityEven();
-
-            cpu.ControlLines.SystemClock.Tick();
+            
             cpu.WriteMemory(addr, data);
 
             return 15;
@@ -176,14 +171,13 @@ namespace Z80Sharp.Instructions
             cpu.ControlLines.SystemClock.TickMultiple(2);
             
             var addr = cpu.Registers.IY.CalculateIndex(instruction[2]);
-            var data = cpu.ReadMemory(addr);
+            var data = cpu.ReadMemory(addr, 1);
 
             data = RotateByteLeftThroughCarry(cpu, data);
             cpu.Registers.Sign = data.IsNegative();
             cpu.Registers.Zero = data == 0;
             cpu.Registers.ParityOrOverflow = data.IsParityEven();
-
-            cpu.ControlLines.SystemClock.Tick();
+            
             cpu.WriteMemory(addr, data);
 
             return 15;
@@ -213,8 +207,7 @@ namespace Z80Sharp.Instructions
         [BitInstruction("RRC (HL)", 2, 0xCB, 0x0E)]
         public static int RRC_HL_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.Tick();
-            var data = cpu.ReadMemory(cpu.Registers.HL);
+            var data = cpu.ReadMemory(cpu.Registers.HL, 1);
 
             data = RotateByteRight(cpu, data);
             cpu.Registers.Sign = data.IsNegative();
@@ -231,14 +224,13 @@ namespace Z80Sharp.Instructions
             cpu.ControlLines.SystemClock.TickMultiple(2);
             
             var addr = cpu.Registers.IX.CalculateIndex(instruction[2]);
-            var data = cpu.ReadMemory(addr);
+            var data = cpu.ReadMemory(addr, 1);
 
             data = RotateByteRight(cpu, data);
             cpu.Registers.Sign = data.IsNegative();
             cpu.Registers.Zero = data == 0;
             cpu.Registers.ParityOrOverflow = data.IsParityEven();
-
-            cpu.ControlLines.SystemClock.Tick();
+            
             cpu.WriteMemory(addr, data);
 
             return 15;
@@ -250,14 +242,13 @@ namespace Z80Sharp.Instructions
             cpu.ControlLines.SystemClock.TickMultiple(2);
             
             var addr = cpu.Registers.IY.CalculateIndex(instruction[2]);
-            var data = cpu.ReadMemory(addr);
+            var data = cpu.ReadMemory(addr, 1);
 
             data = RotateByteRight(cpu, data);
             cpu.Registers.Sign = data.IsNegative();
             cpu.Registers.Zero = data == 0;
             cpu.Registers.ParityOrOverflow = data.IsParityEven();
-
-            cpu.ControlLines.SystemClock.Tick();
+            
             cpu.WriteMemory(addr, data);
 
             return 15;
@@ -287,8 +278,7 @@ namespace Z80Sharp.Instructions
         [BitInstruction("RR (HL)", 2, 0xCB, 0x1E)]
         public static int RR_HL_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.Tick();
-            var data = cpu.ReadMemory(cpu.Registers.HL);
+            var data = cpu.ReadMemory(cpu.Registers.HL, 1);
 
             data = RotateByteRightThroughCarry(cpu, data);
             cpu.Registers.Sign = data.IsNegative();
@@ -305,14 +295,13 @@ namespace Z80Sharp.Instructions
             cpu.ControlLines.SystemClock.TickMultiple(2);
             
             var addr = cpu.Registers.IX.CalculateIndex(instruction[2]);
-            var data = cpu.ReadMemory(addr);
+            var data = cpu.ReadMemory(addr, 1);
 
             data = RotateByteRightThroughCarry(cpu, data);
             cpu.Registers.Sign = data.IsNegative();
             cpu.Registers.Zero = data == 0;
             cpu.Registers.ParityOrOverflow = data.IsParityEven();
-
-            cpu.ControlLines.SystemClock.Tick();
+            
             cpu.WriteMemory(addr, data);
 
             return 15;
@@ -324,14 +313,13 @@ namespace Z80Sharp.Instructions
             cpu.ControlLines.SystemClock.TickMultiple(2);
             
             var addr = cpu.Registers.IY.CalculateIndex(instruction[2]);
-            var data = cpu.ReadMemory(addr);
+            var data = cpu.ReadMemory(addr, 1);
 
             data = RotateByteRightThroughCarry(cpu, data);
             cpu.Registers.Sign = data.IsNegative();
             cpu.Registers.Zero = data == 0;
             cpu.Registers.ParityOrOverflow = data.IsParityEven();
-
-            cpu.ControlLines.SystemClock.Tick();
+            
             cpu.WriteMemory(addr, data);
 
             return 15;
@@ -354,7 +342,7 @@ namespace Z80Sharp.Instructions
             cpu.Registers.ParityOrOverflow = acc.IsParityEven();
             cpu.Registers.Subtract = false;
 
-            cpu.ControlLines.SystemClock.TickMultiple(4);
+            cpu.InsertWaitMachineCycle(4);
             cpu.WriteMemory(cpu.Registers.HL, data);
 
             return 18;
@@ -377,7 +365,7 @@ namespace Z80Sharp.Instructions
             cpu.Registers.ParityOrOverflow = acc.IsParityEven();
             cpu.Registers.Subtract = false;
 
-            cpu.ControlLines.SystemClock.TickMultiple(4);
+            cpu.InsertWaitMachineCycle(4);
             cpu.WriteMemory(cpu.Registers.HL, data);
 
             return 18;
@@ -451,8 +439,7 @@ namespace Z80Sharp.Instructions
         [BitInstruction("SLA (HL)", 2, 0xCB, 0x26)]
         public static int SLA_HL_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.Tick();
-            var data = cpu.ReadMemory(cpu.Registers.HL);
+            var data = cpu.ReadMemory(cpu.Registers.HL, 1);
 
             cpu.Registers.Carry = data.GetBit(7);
             data <<= 1;
@@ -473,7 +460,7 @@ namespace Z80Sharp.Instructions
             cpu.ControlLines.SystemClock.TickMultiple(2);
 
             var addr = cpu.Registers.IX.CalculateIndex(instruction[2]);
-            var data = cpu.ReadMemory(addr);
+            var data = cpu.ReadMemory(addr, 1);
 
             cpu.Registers.Carry = data.GetBit(7);
             data <<= 1;
@@ -482,8 +469,7 @@ namespace Z80Sharp.Instructions
             cpu.Registers.HalfCarry = false;
             cpu.Registers.ParityOrOverflow = data.IsParityEven();
             cpu.Registers.Subtract = false;
-
-            cpu.ControlLines.SystemClock.Tick();
+            
             cpu.WriteMemory(addr, data);
 
             return 15;
@@ -495,7 +481,7 @@ namespace Z80Sharp.Instructions
             cpu.ControlLines.SystemClock.TickMultiple(2);
 
             var addr = cpu.Registers.IY.CalculateIndex(instruction[2]);
-            var data = cpu.ReadMemory(addr);
+            var data = cpu.ReadMemory(addr, 1);
 
             cpu.Registers.Carry = data.GetBit(7);
             data <<= 1;
@@ -504,8 +490,7 @@ namespace Z80Sharp.Instructions
             cpu.Registers.HalfCarry = false;
             cpu.Registers.ParityOrOverflow = data.IsParityEven();
             cpu.Registers.Subtract = false;
-
-            cpu.ControlLines.SystemClock.Tick();
+            
             cpu.WriteMemory(addr, data);
 
             return 15;
@@ -540,8 +525,7 @@ namespace Z80Sharp.Instructions
         [BitInstruction("SRA (HL)", 2, 0xCB, 0x2E)]
         public static int SRA_HL_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.Tick();
-            var data = cpu.ReadMemory(cpu.Registers.HL);
+            var data = cpu.ReadMemory(cpu.Registers.HL, 1);
 
             cpu.Registers.Carry = data.GetBit(0);
             data >>= 1;
@@ -563,7 +547,7 @@ namespace Z80Sharp.Instructions
             cpu.ControlLines.SystemClock.TickMultiple(2);
 
             var addr = cpu.Registers.IX.CalculateIndex(instruction[2]);
-            var data = cpu.ReadMemory(addr);
+            var data = cpu.ReadMemory(addr, 1);
 
             cpu.Registers.Carry = data.GetBit(0);
             data >>= 1;
@@ -573,8 +557,7 @@ namespace Z80Sharp.Instructions
             cpu.Registers.HalfCarry = false;
             cpu.Registers.ParityOrOverflow = data.IsParityEven();
             cpu.Registers.Subtract = false;
-
-            cpu.ControlLines.SystemClock.Tick();
+            
             cpu.WriteMemory(addr, data);
 
             return 15;
@@ -586,7 +569,7 @@ namespace Z80Sharp.Instructions
             cpu.ControlLines.SystemClock.TickMultiple(2);
 
             var addr = cpu.Registers.IY.CalculateIndex(instruction[2]);
-            var data = cpu.ReadMemory(addr);
+            var data = cpu.ReadMemory(addr, 1);
 
             cpu.Registers.Carry = data.GetBit(0);
             data >>= 1;
@@ -596,8 +579,7 @@ namespace Z80Sharp.Instructions
             cpu.Registers.HalfCarry = false;
             cpu.Registers.ParityOrOverflow = data.IsParityEven();
             cpu.Registers.Subtract = false;
-
-            cpu.ControlLines.SystemClock.Tick();
+            
             cpu.WriteMemory(addr, data);
 
             return 15;
@@ -631,8 +613,7 @@ namespace Z80Sharp.Instructions
         [BitInstruction("SRL (HL)", 2, 0xCB, 0x3E)]
         public static int SRL_HL_mem(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.Tick();
-            var data = cpu.ReadMemory(cpu.Registers.HL);
+            var data = cpu.ReadMemory(cpu.Registers.HL, 1);
 
             cpu.Registers.Carry = data.GetBit(0);
             data >>= 1;
@@ -653,7 +634,7 @@ namespace Z80Sharp.Instructions
             cpu.ControlLines.SystemClock.TickMultiple(2);
 
             var addr = cpu.Registers.IX.CalculateIndex(instruction[2]);
-            var data = cpu.ReadMemory(addr);
+            var data = cpu.ReadMemory(addr, 1);
 
             cpu.Registers.Carry = data.GetBit(0);
             data >>= 1;
@@ -662,8 +643,7 @@ namespace Z80Sharp.Instructions
             cpu.Registers.HalfCarry = false;
             cpu.Registers.ParityOrOverflow = data.IsParityEven();
             cpu.Registers.Subtract = false;
-
-            cpu.ControlLines.SystemClock.Tick();
+            
             cpu.WriteMemory(addr, data);
 
             return 15;
@@ -675,7 +655,7 @@ namespace Z80Sharp.Instructions
             cpu.ControlLines.SystemClock.TickMultiple(2);
 
             var addr = cpu.Registers.IY.CalculateIndex(instruction[2]);
-            var data = cpu.ReadMemory(addr);
+            var data = cpu.ReadMemory(addr, 1);
 
             cpu.Registers.Carry = data.GetBit(0);
             data >>= 1;
@@ -684,8 +664,7 @@ namespace Z80Sharp.Instructions
             cpu.Registers.HalfCarry = false;
             cpu.Registers.ParityOrOverflow = data.IsParityEven();
             cpu.Registers.Subtract = false;
-
-            cpu.ControlLines.SystemClock.Tick();
+            
             cpu.WriteMemory(addr, data);
 
             return 15;

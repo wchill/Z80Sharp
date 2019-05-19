@@ -42,10 +42,8 @@ namespace Z80Sharp.Instructions
         [ExtendedInstruction("INI", 2, 0xED, 0xA2)]
         public static int INI(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.Tick();
-
             var portAddr = Utilities.LETo16Bit(cpu.Registers.C, cpu.Registers.B);
-            var data = cpu.ReadFromPort(portAddr);
+            var data = cpu.ReadFromPort(portAddr, 1);
 
             cpu.WriteMemory(cpu.Registers.HL, data);
             cpu.Registers.B--;
@@ -59,10 +57,8 @@ namespace Z80Sharp.Instructions
         [ExtendedInstruction("INIR", 2, 0xED, 0xB2)]
         public static int INIR(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.Tick();
-
             var portAddr = Utilities.LETo16Bit(cpu.Registers.C, cpu.Registers.B);
-            var data = cpu.ReadFromPort(portAddr);
+            var data = cpu.ReadFromPort(portAddr, 1);
 
             cpu.WriteMemory(cpu.Registers.HL, data);
             cpu.Registers.B--;
@@ -73,7 +69,7 @@ namespace Z80Sharp.Instructions
             if (cpu.Registers.B == 0) return 16;
 
             cpu.Registers.PC -= 2;
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
 
             return 21;
         }
@@ -81,10 +77,8 @@ namespace Z80Sharp.Instructions
         [ExtendedInstruction("IND", 2, 0xED, 0xAA)]
         public static int IND(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.Tick();
-
             var portAddr = Utilities.LETo16Bit(cpu.Registers.C, cpu.Registers.B);
-            var data = cpu.ReadFromPort(portAddr);
+            var data = cpu.ReadFromPort(portAddr, 1);
 
             cpu.WriteMemory(cpu.Registers.HL, data);
             cpu.Registers.B--;
@@ -98,10 +92,8 @@ namespace Z80Sharp.Instructions
         [ExtendedInstruction("INDR", 2, 0xED, 0xBA)]
         public static int INDR(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.ControlLines.SystemClock.Tick();
-
             var portAddr = Utilities.LETo16Bit(cpu.Registers.C, cpu.Registers.B);
-            var data = cpu.ReadFromPort(portAddr);
+            var data = cpu.ReadFromPort(portAddr, 1);
 
             cpu.WriteMemory(cpu.Registers.HL, data);
             cpu.Registers.B--;
@@ -112,7 +104,7 @@ namespace Z80Sharp.Instructions
             if (cpu.Registers.B == 0) return 16;
 
             cpu.Registers.PC -= 2;
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
 
             return 21;
         }
@@ -173,7 +165,7 @@ namespace Z80Sharp.Instructions
             if (cpu.Registers.B == 0) return 16;
 
             cpu.Registers.PC -= 2;
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
 
             return 21;
         }
@@ -208,7 +200,7 @@ namespace Z80Sharp.Instructions
             if (cpu.Registers.B == 0) return 16;
 
             cpu.Registers.PC -= 2;
-            cpu.ControlLines.SystemClock.TickMultiple(5);
+            cpu.InsertWaitMachineCycle(5);
 
             return 21;
         }
