@@ -5,8 +5,10 @@ using Z80Sharp.Instructions.Attributes;
 
 namespace Z80Sharp.Instructions
 {
-    public partial class Z80Instructions
+    public static partial class Z80Instructions
     {
+        #region General
+
         [MainInstruction("NOP", 1, 0x00)]
         public static int NOP(IZ80CPU cpu, byte[] instruction)
         {
@@ -62,5 +64,154 @@ namespace Z80Sharp.Instructions
 
             return 8;
         }
+
+        #endregion
+
+        #region Jump
+
+        [MainInstruction("JP nn", 3, 0xC3)]
+        public static int JP_nn(IZ80CPU cpu, byte[] instruction)
+        {
+            cpu.Registers.PC = Utilities.LETo16Bit(instruction[1], instruction[2]);
+            return 10;
+        }
+
+        [MainInstruction("JP NZ, nn", 3, 0xC2)]
+        [MainInstruction("JP Z, nn", 3, 0xCA)]
+        [MainInstruction("JP NC, nn", 3, 0xD2)]
+        [MainInstruction("JP C, nn", 3, 0xDA)]
+        [MainInstruction("JP PO, nn", 3, 0xE2)]
+        [MainInstruction("JP PE, nn", 3, 0xEA)]
+        [MainInstruction("JP P, nn", 3, 0xF2)]
+        [MainInstruction("JP M, nn", 3, 0xFA)]
+        public static int JP_cc_nn(IZ80CPU cpu, byte[] instruction)
+        {
+            var condition = instruction[0].ExtractBits(3, 3);
+            var shouldJump = false;
+
+            switch (condition)
+            {
+                case 0b000: shouldJump = !cpu.Registers.Zero; break;
+                case 0b001: shouldJump = cpu.Registers.Zero; break;
+                case 0b010: shouldJump = !cpu.Registers.Carry; break;
+                case 0b011: shouldJump = cpu.Registers.Carry; break;
+                case 0b100: shouldJump = !cpu.Registers.ParityOrOverflow; break;
+                case 0b101: shouldJump = cpu.Registers.ParityOrOverflow; break;
+                case 0b110: shouldJump = !cpu.Registers.Sign; break;
+                case 0b111: shouldJump = cpu.Registers.Sign; break;
+                default: throw new InvalidOperationException();
+            }
+
+            if (shouldJump)
+            {
+                cpu.Registers.PC = Utilities.LETo16Bit(instruction[1], instruction[2]);
+            }
+            return 10;
+        }
+
+        [MainInstruction("JR e", 2, 0x18)]
+        public static int JR_e(IZ80CPU cpu, byte[] instruction)
+        {
+            var offset = (int) instruction[1];
+            offset += 2;
+
+            if (offset < 0)
+            {
+                cpu.Registers.PC -= (ushort) Math.Abs(offset);
+            }
+            else
+            {
+                cpu.Registers.PC += (ushort) offset;
+            }
+            
+            cpu.ControlLines.SystemClock.TickMultiple(5);
+            return 12;
+        }
+
+        [MainInstruction("JR C, e", 2, 0x38)]
+        [MainInstruction("JR NC, e", 2, 0x30)]
+        [MainInstruction("JR Z, e", 2, 0x28)]
+        [MainInstruction("JR NZ, e", 2, 0x20)]
+        public static int JR_cc_e(IZ80CPU cpu, byte[] instruction)
+        {
+            var condition = instruction[0].ExtractBits(3, 2);
+            var shouldJump = false;
+
+            switch (condition)
+            {
+                case 0b00: shouldJump = !cpu.Registers.Zero; break;
+                case 0b01: shouldJump = cpu.Registers.Zero; break;
+                case 0b10: shouldJump = !cpu.Registers.Carry; break;
+                case 0b11: shouldJump = cpu.Registers.Carry; break;
+                default: throw new InvalidOperationException();
+            }
+
+            if (!shouldJump) return 7;
+
+            var offset = (int)instruction[1];
+            offset += 2;
+
+            if (offset < 0)
+            {
+                cpu.Registers.PC -= (ushort)Math.Abs(offset);
+            }
+            else
+            {
+                cpu.Registers.PC += (ushort)offset;
+            }
+
+            cpu.ControlLines.SystemClock.TickMultiple(5);
+            return 12;
+
+        }
+
+        [MainInstruction("JP (HL)", 1, 0xE9)]
+        public static int JP_HL(IZ80CPU cpu, byte[] instruction)
+        {
+            cpu.Registers.PC = cpu.Registers.HL;
+            return 4;
+        }
+
+        [IXInstruction("JP (IX)", 2, 0xDD, 0xE9)]
+        public static int JP_IX(IZ80CPU cpu, byte[] instruction)
+        {
+            cpu.Registers.PC = cpu.Registers.IX;
+            return 8;
+        }
+
+        [IYInstruction("JP (IY)", 2, 0xFD, 0xE9)]
+        public static int JP_IY(IZ80CPU cpu, byte[] instruction)
+        {
+            cpu.Registers.PC = cpu.Registers.IY;
+            return 8;
+        }
+
+        [MainInstruction("DJNZ, e", 2, 0x10)]
+        public static int DJNZ_e(IZ80CPU cpu, byte[] instruction)
+        {
+            // FIXME: The opcode fetch has the tick after it, then the memory read for the operand
+            cpu.ControlLines.SystemClock.Tick();
+
+            cpu.Registers.B--;
+
+            if (cpu.Registers.B == 0) return 8;
+
+            var offset = (int)instruction[1];
+            offset += 2;
+
+            if (offset < 0)
+            {
+                cpu.Registers.PC -= (ushort)Math.Abs(offset);
+            }
+            else
+            {
+                cpu.Registers.PC += (ushort)offset;
+            }
+
+            cpu.ControlLines.SystemClock.TickMultiple(5);
+            return 13;
+        }
+
+        #endregion
     }
 }

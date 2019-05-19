@@ -7,22 +7,20 @@ namespace Z80Sharp
     {
         public Z80RegisterFile Registers { get; }
         public Z80CPULines ControlLines { get; }
-
-        private readonly InstructionDecoder _decoder;
+        
         private long _cycleCount;
 
         public Z80CPU(Z80CPULines lines)
         {
             Registers = new Z80RegisterFile();
             ControlLines = lines;
-            _decoder = new InstructionDecoder();
 
             lines.AttachCpu(this);
         }
 
         public void Tick()
         {
-            var instruction = _decoder.DecodeNextInstruction(this, out var instrBytes);
+            var instruction = InstructionDecoder.DecodeNextInstruction(this, out var instrBytes);
             _cycleCount += instruction.Execute(this, instrBytes);
 
             if (_cycleCount != ControlLines.SystemClock.Ticks)

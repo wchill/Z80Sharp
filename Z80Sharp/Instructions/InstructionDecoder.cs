@@ -6,24 +6,29 @@ using Z80Sharp.Instructions.Attributes;
 
 namespace Z80Sharp.Instructions
 {
-    public class InstructionDecoder
+    public static class InstructionDecoder
     {
-        private static readonly IInstruction[] MainInstructions =
-            ConstructInstructionTablesByReflection<MainInstructionAttribute>();
-        private static readonly IInstruction[] ExtendedInstructions =
-            ConstructInstructionTablesByReflection<ExtendedInstructionAttribute>();
-        private static readonly IInstruction[] BitInstructions =
-            ConstructInstructionTablesByReflection<BitInstructionAttribute>();
-        private static readonly IInstruction[] IXInstructions =
-            ConstructInstructionTablesByReflection<IXInstructionAttribute>();
-        private static readonly IInstruction[] IYInstructions =
-            ConstructInstructionTablesByReflection<IYInstructionAttribute>();
-        private static readonly IInstruction[] IXBitInstructions =
-            ConstructInstructionTablesByReflection<IXBitInstructionAttribute>();
-        private static readonly IInstruction[] IYBitInstructions =
-            ConstructInstructionTablesByReflection<IYBitInstructionAttribute>();
+        private static readonly IInstruction[] MainInstructions;
+        private static readonly IInstruction[] ExtendedInstructions;
+        private static readonly IInstruction[] BitInstructions;
+        private static readonly IInstruction[] IXInstructions;
+        private static readonly IInstruction[] IYInstructions;
+        private static readonly IInstruction[] IXBitInstructions;
+        private static readonly IInstruction[] IYBitInstructions;
 
-        private static readonly HashSet<byte[]> LoadedOpcodes = new HashSet<byte[]>();
+        public static readonly HashSet<byte[]> LoadedOpcodes;
+
+        static InstructionDecoder()
+        {
+            LoadedOpcodes = new HashSet<byte[]>();
+            MainInstructions = ConstructInstructionTablesByReflection<MainInstructionAttribute>();
+            ExtendedInstructions = ConstructInstructionTablesByReflection<ExtendedInstructionAttribute>();
+            BitInstructions = ConstructInstructionTablesByReflection<BitInstructionAttribute>();
+            IXInstructions = ConstructInstructionTablesByReflection<IXInstructionAttribute>();
+            IYInstructions = ConstructInstructionTablesByReflection<IYInstructionAttribute>();
+            IXBitInstructions = ConstructInstructionTablesByReflection<IXBitInstructionAttribute>();
+            IYBitInstructions = ConstructInstructionTablesByReflection<IYBitInstructionAttribute>();
+        }
 
         public static int UnimplementedOpcode(IZ80CPU cpu, byte[] instruction)
         {
@@ -31,7 +36,7 @@ namespace Z80Sharp.Instructions
                 $"Instruction {string.Join(" ", instruction.Select(b => b.ToString("X4")))} is not implemented.");
         }
 
-        public IInstruction DecodeNextInstruction(IZ80CPU cpu, out byte[] instrBytes)
+        public static IInstruction DecodeNextInstruction(IZ80CPU cpu, out byte[] instrBytes)
         {
             var data = new List<byte>
             {
@@ -51,7 +56,8 @@ namespace Z80Sharp.Instructions
                     {
                         data.Add(cpu.ReadMemory(cpu.Registers.PC));
                         cpu.Registers.PC++;
-                        data.Add(cpu.FetchOpcode());
+                        data.Add(cpu.ReadMemory(cpu.Registers.PC));
+                        cpu.Registers.PC++;
                         instruction = IXBitInstructions[data[3]];
                     }
                     else
@@ -69,7 +75,8 @@ namespace Z80Sharp.Instructions
                     {
                         data.Add(cpu.ReadMemory(cpu.Registers.PC));
                         cpu.Registers.PC++;
-                        data.Add(cpu.FetchOpcode());
+                        data.Add(cpu.ReadMemory(cpu.Registers.PC));
+                        cpu.Registers.PC++;
                         instruction = IYBitInstructions[data[3]];
                     }
                     else

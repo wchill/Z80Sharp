@@ -7,32 +7,6 @@ namespace Z80Sharp.Instructions
 {
     public static partial class Z80Instructions
     {
-
-        [MainInstruction("RLCA", 1, 0x07)]
-        public static int RLCA(IZ80CPU cpu, byte[] instruction)
-        {
-            var temp = (cpu.Registers.A << 1) | (cpu.Registers.A.GetBitAsByte(7) >> 7);
-            cpu.Registers.A = (byte)(temp & 0xFF);
-            cpu.Registers.Carry = cpu.Registers.A.GetBit(0);
-            cpu.Registers.HalfCarry = false;
-            cpu.Registers.Subtract = false;
-
-            return 4;
-        }
-
-        [MainInstruction("RLA", 1, 0x17)]
-        public static int RLA(IZ80CPU cpu, byte[] instruction)
-        {
-            var carry = cpu.Registers.A.GetBit(7);
-            var temp = (cpu.Registers.A << 1) | (cpu.Registers.Carry ? 1 : 0);
-            cpu.Registers.A = (byte)(temp & 0xFF);
-            cpu.Registers.Carry = carry;
-            cpu.Registers.HalfCarry = false;
-            cpu.Registers.Subtract = false;
-
-            return 4;
-        }
-
         #region Helper methods
         private static void WriteByteToCpuRegister(IZ80CPU cpu, int register, byte data)
         {

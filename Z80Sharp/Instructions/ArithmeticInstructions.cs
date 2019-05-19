@@ -5,7 +5,7 @@ using Z80Sharp.Instructions.Attributes;
 
 namespace Z80Sharp.Instructions
 {
-    public partial class Z80Instructions
+    public static partial class Z80Instructions
     {
         #region 8-bit operations
 
@@ -655,7 +655,7 @@ namespace Z80Sharp.Instructions
             cpu.Registers.A = acc;
             cpu.Registers.Sign = acc.IsNegative();
             cpu.Registers.Zero = acc == 0;
-            cpu.Registers.ParityOrOverflow = acc.GetNumBitsSet() % 2 == 0;
+            cpu.Registers.ParityOrOverflow = acc.IsParityEven();
 
             return 4;
         }
@@ -712,12 +712,128 @@ namespace Z80Sharp.Instructions
 
         #region 16-bit operations
 
+        [MainInstruction("ADD HL, BC", 1, 0x09)]
+        [MainInstruction("ADD HL, DE", 1, 0x19)]
+        [MainInstruction("ADD HL, HL", 1, 0x29)]
+        [MainInstruction("ADD HL, SP", 1, 0x39)]
+        public static int ADD_HL_ss(IZ80CPU cpu, byte[] instruction)
+        {
+            var src = instruction[0].ExtractBits(4, 2);
+            var data = ReadWordFromCpuRegister_BC_DE_HL_SP(cpu, src);
+
+            cpu.ControlLines.SystemClock.TickMultiple(4);
+
+            var upperReg = data.GetUpperByte();
+            var upperHL = cpu.Registers.H;
+            cpu.Registers.HL += data;
+            cpu.Registers.HalfCarry = upperHL.WillHalfCarry(upperReg);
+            cpu.Registers.Subtract = false;
+            cpu.Registers.Carry = upperHL.WillCarry(upperReg);
+
+            cpu.ControlLines.SystemClock.TickMultiple(3);
+
+            return 11;
+        }
+
+        [ExtendedInstruction("ADC HL, BC", 2, 0xED, 0x4A)]
+        [ExtendedInstruction("ADC HL, DE", 2, 0xED, 0x5A)]
+        [ExtendedInstruction("ADC HL, HL", 2, 0xED, 0x6A)]
+        [ExtendedInstruction("ADC HL, SP", 2, 0xED, 0x7A)]
+        public static int ADC_HL_ss(IZ80CPU cpu, byte[] instruction)
+        {
+            var src = instruction[0].ExtractBits(4, 2);
+            var data = ReadWordFromCpuRegister_BC_DE_HL_SP(cpu, src);
+
+            cpu.ControlLines.SystemClock.TickMultiple(4);
+            
+            AddWordsWithCarryAndSetConditionBits(cpu, false, data);
+
+            cpu.ControlLines.SystemClock.TickMultiple(3);
+
+            return 15;
+        }
+
+        [ExtendedInstruction("SBC HL, BC", 2, 0xED, 0x42)]
+        [ExtendedInstruction("SBC HL, DE", 2, 0xED, 0x52)]
+        [ExtendedInstruction("SBC HL, HL", 2, 0xED, 0x62)]
+        [ExtendedInstruction("SBC HL, SP", 2, 0xED, 0x72)]
+        public static int SBC_HL_ss(IZ80CPU cpu, byte[] instruction)
+        {
+            var src = instruction[0].ExtractBits(4, 2);
+            var data = ReadWordFromCpuRegister_BC_DE_HL_SP(cpu, src);
+
+            cpu.ControlLines.SystemClock.TickMultiple(4);
+
+            AddWordsWithCarryAndSetConditionBits(cpu, true, data);
+
+            cpu.ControlLines.SystemClock.TickMultiple(3);
+
+            return 15;
+        }
+
+        [IXInstruction("ADD IX, BC", 2, 0xDD, 0x09)]
+        [IXInstruction("ADD IX, DE", 2, 0xDD, 0x19)]
+        [IXInstruction("ADD IX, IX", 2, 0xDD, 0x29)]
+        [IXInstruction("ADD IX, SP", 2, 0xDD, 0x39)]
+        public static int ADD_IX_pp(IZ80CPU cpu, byte[] instruction)
+        {
+            cpu.ControlLines.SystemClock.TickMultiple(4);
+            ushort val = 0;
+            switch (instruction[1])
+            {
+                case 0x09: val = cpu.Registers.BC; break;
+                case 0x19: val = cpu.Registers.DE; break;
+                case 0x29: val = cpu.Registers.IX; break;
+                case 0x39: val = cpu.Registers.SP; break;
+                default: throw new InvalidOperationException();
+            }
+
+            var upperReg = val.GetUpperByte();
+            var upperIX = cpu.Registers.IXUpper;
+            cpu.Registers.IX += val;
+            cpu.Registers.HalfCarry = upperIX.WillHalfCarry(upperReg);
+            cpu.Registers.Subtract = false;
+            cpu.Registers.Carry = upperIX.WillCarry(upperReg);
+
+            cpu.ControlLines.SystemClock.TickMultiple(3);
+            return 15;
+        }
+
+        [IYInstruction("ADD IY, BC", 2, 0xFD, 0x09)]
+        [IYInstruction("ADD IY, DE", 2, 0xFD, 0x19)]
+        [IYInstruction("ADD IY, IY", 2, 0xFD, 0x29)]
+        [IYInstruction("ADD IY, SP", 2, 0xFD, 0x39)]
+        public static int ADD_IY_pp(IZ80CPU cpu, byte[] instruction)
+        {
+            cpu.ControlLines.SystemClock.TickMultiple(4);
+            ushort val = 0;
+            switch (instruction[1])
+            {
+                case 0x09: val = cpu.Registers.BC; break;
+                case 0x19: val = cpu.Registers.DE; break;
+                case 0x29: val = cpu.Registers.IY; break;
+                case 0x39: val = cpu.Registers.SP; break;
+                default: throw new InvalidOperationException();
+            }
+
+            var upperReg = val.GetUpperByte();
+            var upperIY = cpu.Registers.IXUpper;
+            cpu.Registers.IY += val;
+            cpu.Registers.HalfCarry = upperIY.WillHalfCarry(upperReg);
+            cpu.Registers.Subtract = false;
+            cpu.Registers.Carry = upperIY.WillCarry(upperReg);
+
+            cpu.ControlLines.SystemClock.TickMultiple(3);
+            return 15;
+        }
+
         [MainInstruction("INC BC", 1, 0x03)]
         [MainInstruction("INC DE", 1, 0x13)]
         [MainInstruction("INC HL", 1, 0x23)]
         [MainInstruction("INC SP", 1, 0x33)]
         public static int INC_ss(IZ80CPU cpu, byte[] instruction)
         {
+            cpu.ControlLines.SystemClock.TickMultiple(2);
             switch (instruction[0])
             {
                 case 0x03: cpu.Registers.BC++; break;
@@ -726,14 +842,68 @@ namespace Z80Sharp.Instructions
                 case 0x33: cpu.Registers.SP++; break;
                 default: throw new InvalidOperationException();
             }
-            cpu.ControlLines.SystemClock.TickMultiple(2);
 
             return 6;
         }
 
+        [IXInstruction("INC IX", 2, 0xDD, 0x23)]
+        public static int INC_IX(IZ80CPU cpu, byte[] instruction)
+        {
+            cpu.ControlLines.SystemClock.TickMultiple(2);
+            cpu.Registers.IX++;
+
+            return 10;
+        }
+
+        [IYInstruction("INC IY", 2, 0xFD, 0x23)]
+        public static int INC_IY(IZ80CPU cpu, byte[] instruction)
+        {
+            cpu.ControlLines.SystemClock.TickMultiple(2);
+            cpu.Registers.IY++;
+
+            return 10;
+        }
+
+        [MainInstruction("DEC BC", 1, 0x0B)]
+        [MainInstruction("DEC DE", 1, 0x1B)]
+        [MainInstruction("DEC HL", 1, 0x2B)]
+        [MainInstruction("DEC SP", 1, 0x3B)]
+        public static int DEC_ss(IZ80CPU cpu, byte[] instruction)
+        {
+            cpu.ControlLines.SystemClock.TickMultiple(2);
+            switch (instruction[0])
+            {
+                case 0x03: cpu.Registers.BC--; break;
+                case 0x13: cpu.Registers.DE--; break;
+                case 0x23: cpu.Registers.HL--; break;
+                case 0x33: cpu.Registers.SP--; break;
+                default: throw new InvalidOperationException();
+            }
+
+            return 6;
+        }
+
+        [IXInstruction("DEC IX", 2, 0xDD, 0x2B)]
+        public static int DEC_IX(IZ80CPU cpu, byte[] instruction)
+        {
+            cpu.ControlLines.SystemClock.TickMultiple(2);
+            cpu.Registers.IX--;
+
+            return 10;
+        }
+
+        [IYInstruction("DEC IY", 2, 0xFD, 0x2B)]
+        public static int DEC_IY(IZ80CPU cpu, byte[] instruction)
+        {
+            cpu.ControlLines.SystemClock.TickMultiple(2);
+            cpu.Registers.IY--;
+
+            return 10;
+        }
+
         #endregion
 
-        #region 8-bit Condition bit helpers
+        #region Condition bit helpers
 
         private static void AddBytes(IZ80CPU cpu, byte a, byte b, bool useCarryFlag = false)
         {
@@ -765,6 +935,34 @@ namespace Z80Sharp.Instructions
             cpu.Registers.Carry = carry != 0;
             cpu.Registers.A = result;
         }
+        private static void AddWordsWithCarryAndSetConditionBits(IZ80CPU cpu, bool subtract, ushort b)
+        {
+            var a = cpu.Registers.HL;
+            var c = (ushort) (cpu.Registers.Carry ? 1 : 0);
+
+            if (subtract)
+            {
+                b = b.TwosComplement();
+                c = c.TwosComplement();
+            }
+
+            var sum = a + b + c;
+            var noCarrySum = a ^ b ^ c;
+
+            var carryInto = sum ^ noCarrySum;
+            var halfCarry = carryInto & 0x1000;
+            var carry = carryInto & 0x10000;
+            var overflow = carryInto & 0x8000;
+
+            var result = (ushort)sum;
+            cpu.Registers.Sign = result.IsNegative();
+            cpu.Registers.Zero = result == 0;
+            cpu.Registers.HalfCarry = halfCarry != 0;
+            cpu.Registers.ParityOrOverflow = overflow != 0;
+            cpu.Registers.Subtract = subtract;
+            cpu.Registers.Carry = carry != 0;
+            cpu.Registers.HL = result;
+        }
 
         private static void LogicalAndBytes(IZ80CPU cpu, byte b)
         {
@@ -789,7 +987,7 @@ namespace Z80Sharp.Instructions
             cpu.Registers.Sign = result.IsNegative();
             cpu.Registers.Zero = result == 0;
             cpu.Registers.HalfCarry = true;
-            cpu.Registers.ParityOrOverflow = result.GetNumBitsSet() % 2 == 0;
+            cpu.Registers.ParityOrOverflow = result.IsParityEven();
             cpu.Registers.Subtract = false;
             cpu.Registers.Carry = false;
             cpu.Registers.A = result;

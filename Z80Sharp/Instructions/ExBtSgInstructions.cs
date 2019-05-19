@@ -5,7 +5,7 @@ using Z80Sharp.Instructions.Attributes;
 
 namespace Z80Sharp.Instructions
 {
-    public partial class Z80Instructions
+    public static partial class Z80Instructions
     {
         #region Exchange
 
