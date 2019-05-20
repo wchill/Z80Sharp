@@ -9,6 +9,7 @@ namespace Z80Sharp.Instructions
         byte[] Opcode { get; }
         string Mnemonic { get; }
         bool Undocumented { get; }
+        int InstructionLength { get; }
 
         int Execute(IZ80CPU cpu, byte[] instruction);
     }

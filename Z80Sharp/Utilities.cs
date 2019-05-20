@@ -89,7 +89,7 @@ namespace Z80Sharp
         public static int ExtractBits(this int input, int lowerBitNum, int numBits)
         {
             var mask = ((1 << numBits) - 1) << lowerBitNum;
-            return (input >> lowerBitNum) & mask;
+            return (input & mask) >> lowerBitNum;
         }
 
         public static ushort ExtractBits(this ushort input, int lowerBitNum, int numBits)

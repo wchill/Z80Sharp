@@ -30,7 +30,7 @@ namespace Z80Sharp.Instructions
         public static int UnimplementedOpcode(IZ80CPU cpu, byte[] instruction)
         {
             throw new NotImplementedException(
-                $"Instruction {string.Join(" ", instruction.Select(b => b.ToString("X4")))} is not implemented.");
+                $"Instruction {string.Join(" ", instruction.Select(b => b.ToString("X2")))} is not implemented.");
         }
 
         public static IInstruction DecodeNextInstruction(IZ80CPU cpu, out byte[] instrBytes, byte? initialByte = null)
@@ -86,7 +86,7 @@ namespace Z80Sharp.Instructions
                     break;
             }
 
-            while (data.Count != instruction.Opcode.Length)
+            while (data.Count < instruction.InstructionLength)
             {
                 data.Add(cpu.ReadMemory(cpu.Registers.PC));
                 cpu.Registers.PC++;
@@ -107,7 +107,7 @@ namespace Z80Sharp.Instructions
                 foreach (var attr in attrs)
                 {
                     var func = (Func<IZ80CPU, byte[], int>)Delegate.CreateDelegate(typeof(Func<IZ80CPU, byte[], int>), method);
-                    var instruction = new Instruction(attr.Opcode, attr.Mnemonic, func);
+                    var instruction = new Instruction(attr.Opcode, attr.Mnemonic, attr.Length, func);
 
                     if (instructions[attr.Opcode.Last()] != null)
                     {
@@ -122,7 +122,7 @@ namespace Z80Sharp.Instructions
             {
                 if (instructions[i] == null)
                 {
-                    instructions[i] = new Instruction((byte)i, null, UnimplementedOpcode);
+                    instructions[i] = new Instruction((byte)i, null, 1, UnimplementedOpcode);
                 }
             }
 

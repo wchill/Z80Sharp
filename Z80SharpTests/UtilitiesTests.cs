@@ -9,7 +9,7 @@ namespace Z80SharpTests
         [InlineData(0xFF, 0, 8, 0xFF)]
         [InlineData(0xFF, 0, 1, 0x01)]
         [InlineData(0xFF, 0, 3, 0x07)]
-        [InlineData(0xFF, 1, 3, 0x0E)]
+        [InlineData(0xFF, 3, 3, 0x07)]
         public void TestExtractBits(int num, int start, int len, int expected)
         {
             Assert.Equal(expected, num.ExtractBits(start, len));

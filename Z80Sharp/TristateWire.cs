@@ -41,9 +41,9 @@ namespace Z80Sharp
             WriteValue(wireDevice, state);
         }
 
-        public void WriteValue(IDevice device, TristateWireState newValue)
+        public void WriteValue(IDevice device, TristateWireState? newValue)
         {
-            Values[device] = newValue;
+            Values[device] = newValue ?? TristateWireState.HighImpedance;
             Value = CalculateNewState();
         }
 

@@ -19,8 +19,11 @@
         public IBus<byte> DataBus;
         public IClock SystemClock;
 
-        public void AttachCpu(IDevice cpu)
+        public void AttachCpu(IZ80CPU cpu)
         {
+            AddressBus.AttachDevice(cpu);
+            DataBus.AttachDevice(cpu);
+            SystemClock.AttachClockableDevice(cpu);
             BUSACK.AttachDevice(cpu);
             BUSREQ.AttachDevice(cpu);
             HALT.AttachDevice(cpu);

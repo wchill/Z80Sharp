@@ -28,6 +28,11 @@ namespace Z80Sharp
             Connections.AttachMemory(this);
         }
 
+        public void LoadIntoMemory(ushort address, ReadOnlySpan<byte> data)
+        {
+            data.CopyTo(_memory.AsSpan(address));
+        }
+
         public void Tick()
         {
             if (Connections.MREQ.Value == TristateWireState.LogicHigh ||

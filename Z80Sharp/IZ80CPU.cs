@@ -8,6 +8,7 @@ namespace Z80Sharp
     {
         Z80RegisterFile Registers { get; }
         Z80CPULines ControlLines { get; }
+        Stack<ushort> InterruptsBeingServiced { get; }
 
         byte FetchOpcode();
         void InsertWaitMachineCycle(int numCycles);

@@ -851,10 +851,10 @@ namespace Z80Sharp.Instructions
             cpu.ControlLines.SystemClock.TickMultiple(2);
             switch (instruction[0])
             {
-                case 0x03: cpu.Registers.BC--; break;
-                case 0x13: cpu.Registers.DE--; break;
-                case 0x23: cpu.Registers.HL--; break;
-                case 0x33: cpu.Registers.SP--; break;
+                case 0x0B: cpu.Registers.BC--; break;
+                case 0x1B: cpu.Registers.DE--; break;
+                case 0x2B: cpu.Registers.HL--; break;
+                case 0x3B: cpu.Registers.SP--; break;
                 default: throw new InvalidOperationException();
             }
 

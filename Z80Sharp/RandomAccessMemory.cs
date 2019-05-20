@@ -18,7 +18,7 @@ namespace Z80Sharp
 
         private bool _isWaiting;
 
-        public RandomAccessMemory(ushort beginAddress, ushort size, MemoryLines connections)
+        public RandomAccessMemory(ushort beginAddress, int size, MemoryLines connections)
         {
             if (size < 1)
             {
@@ -39,6 +39,11 @@ namespace Z80Sharp
             EndAddress = (ushort)(beginAddress + _memory.Length - 1);
             Connections = connections;
             Connections.AttachMemory(this);
+        }
+
+        public void LoadIntoMemory(ushort address, ReadOnlySpan<byte> data)
+        {
+            data.CopyTo(_memory.AsSpan(address));
         }
 
         public void Tick()

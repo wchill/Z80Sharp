@@ -468,7 +468,7 @@ namespace Z80Sharp.Instructions
             var src = instruction[0].ExtractBits(4, 2);
             var data = ReadWordFromCpuRegister_BC_DE_HL_AF(cpu, src);
             
-            cpu.PushWord(data, 2);
+            cpu.PushWord(data, 1);
 
             return 11;
         }
@@ -476,7 +476,7 @@ namespace Z80Sharp.Instructions
         [IXInstruction("PUSH IX", 2, 0xDD, 0xE5)]
         public static int PUSH_IX(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.PushWord(cpu.Registers.IX, 2);
+            cpu.PushWord(cpu.Registers.IX, 1);
 
             return 15;
         }
@@ -484,7 +484,7 @@ namespace Z80Sharp.Instructions
         [IYInstruction("PUSH IY", 2, 0xFD, 0xE5)]
         public static int PUSH_IY(IZ80CPU cpu, byte[] instruction)
         {
-            cpu.PushWord(cpu.Registers.IY, 2);
+            cpu.PushWord(cpu.Registers.IY, 1);
 
             return 15;
         }

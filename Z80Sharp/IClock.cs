@@ -4,6 +4,7 @@
     {
         long Ticks { get; }
         void AttachClockableDevice(IClockedComponent device);
+        void DetachClockableDevice(IClockedComponent device);
         void TickMultiple(int ticks);
     }
 }

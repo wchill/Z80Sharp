@@ -6,23 +6,23 @@ namespace Z80Sharp
 {
     public class Z80System
     {
-        private readonly Z80CPU _cpu;
-        private readonly AddressBus _addressBus;
-        private readonly DataBus _dataBus;
-        private readonly Z80CPULines _cpuLines;
-        private readonly RandomAccessMemory _z80Ram;
-        private readonly IClock _z80Clock;
+        public readonly Z80CPU Cpu;
+        public readonly AddressBus AddressBus;
+        public readonly DataBus DataBus;
+        public readonly Z80CPULines CpuLines;
+        public readonly RandomAccessMemory Memory;
+        public readonly IClock Z80Clock;
 
         public Z80System()
         {
-            _dataBus = new DataBus();
-            _addressBus = new AddressBus();
-            _z80Clock = new PassthroughClock();
-            _cpuLines = new Z80CPULines
+            DataBus = new DataBus();
+            AddressBus = new AddressBus();
+            Z80Clock = new PassthroughClock();
+            CpuLines = new Z80CPULines
             {
-                AddressBus = _addressBus,
-                DataBus = _dataBus,
-                SystemClock = _z80Clock,
+                AddressBus = AddressBus,
+                DataBus = DataBus,
+                SystemClock = Z80Clock,
                 BUSACK = new TristateWire(),
                 BUSREQ = new TristateWire(TristateWireState.PullUp),
                 HALT = new TristateWire(),
@@ -40,16 +40,16 @@ namespace Z80Sharp
 
             var memoryConnects = new MemoryLines
             {
-                AddressBus = _addressBus,
-                Clock = _z80Clock,
-                DataBus = _dataBus,
-                MREQ = _cpuLines.MREQ,
-                RD = _cpuLines.RD,
-                WAIT = _cpuLines.WAIT,
-                WR = _cpuLines.WR
+                AddressBus = AddressBus,
+                Clock = Z80Clock,
+                DataBus = DataBus,
+                MREQ = CpuLines.MREQ,
+                RD = CpuLines.RD,
+                WAIT = CpuLines.WAIT,
+                WR = CpuLines.WR
             };
-            _z80Ram = new RandomAccessMemory(0, 0x4000, memoryConnects);
-            _cpu = new Z80CPU(_cpuLines);
+            Memory = new RandomAccessMemory(0, 0x10000, memoryConnects);
+            Cpu = new Z80CPU(CpuLines);
         }
     }
 }

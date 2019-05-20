@@ -309,6 +309,7 @@ namespace Z80Sharp.Instructions
             cpu.Registers.PC = cpu.Registers.PC.SetLowerByte(cpu.PopByte());
             cpu.Registers.PC = cpu.Registers.PC.SetUpperByte(cpu.PopByte());
 
+            cpu.InterruptsBeingServiced.Pop();
             return 14;
         }
 
@@ -319,6 +320,7 @@ namespace Z80Sharp.Instructions
             cpu.Registers.PC = cpu.Registers.PC.SetUpperByte(cpu.PopByte());
             cpu.Registers.IFF1 = cpu.Registers.IFF2;
 
+            cpu.InterruptsBeingServiced.Pop();
             return 14;
         }
 

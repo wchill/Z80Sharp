@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Z80Sharp.Instructions;
 
 namespace Z80Sharp
@@ -7,25 +10,85 @@ namespace Z80Sharp
     {
         public Z80RegisterFile Registers { get; }
         public Z80CPULines ControlLines { get; }
-        
+        public Stack<ushort> InterruptsBeingServiced { get; }
+
         private long _cycleCount;
 
         public Z80CPU(Z80CPULines lines)
         {
             Registers = new Z80RegisterFile();
             ControlLines = lines;
+            InterruptsBeingServiced = new Stack<ushort>();
 
-            lines.AttachCpu(this);
+            ControlLines.AttachCpu(this);
         }
 
         public void Tick()
         {
+            if (InterruptsBeingServiced.Any())
+            {
+                _cycleCount++;
+            }
+
+            if (ControlLines.RESET.Value == TristateWireState.LogicLow)
+            {
+                ControlLines.SystemClock.DetachClockableDevice(this);
+                HandleRESET();
+                ControlLines.SystemClock.AttachClockableDevice(this);
+            }
+        }
+
+        public void ExecuteNextInstruction()
+        {
+            if (Registers.PC == 0)
+            {
+                throw new InvalidOperationException("Hit address 0");
+            }
+            if (Registers.PC == 5)
+            {
+                // Handle CP/M syscalls
+                switch (Registers.C)
+                {
+                    case 2:
+                    {
+                        var inputByte = Registers.E;
+                        var outputChar = Encoding.ASCII.GetString(new[] {inputByte})[0];
+                        Console.Write(outputChar);
+                        break;
+                    }
+                    case 9:
+                    {
+                        var strAddress = Registers.DE;
+                        var inputBytes = new List<byte>();
+                        byte inputByte;
+                        _cycleCount += 3;
+                        while ((inputByte = ReadMemory(strAddress)) != '$')
+                        {
+                            _cycleCount += 3;
+                            inputBytes.Add(inputByte);
+                            strAddress++;
+                        }
+                        var outputChar = Encoding.ASCII.GetString(inputBytes.ToArray());
+                        Console.Write(outputChar);
+                        break;
+                    }
+                    default:
+                        // throw new NotImplementedException($"Unimplemented syscall {Registers.C}");
+                        break;
+                }
+
+                FetchOpcode();
+                _cycleCount += Z80Instructions.RET(this, null);
+            }
+
             var instruction = InstructionDecoder.DecodeNextInstruction(this, out var instrBytes);
+
+            var beforeCount = _cycleCount;
             _cycleCount += instruction.Execute(this, instrBytes);
 
             if (_cycleCount != ControlLines.SystemClock.Ticks)
             {
-                throw new InvalidOperationException($"Cycle mismatch when executing instruction {instruction.Mnemonic}");
+                throw new InvalidOperationException($"Cycle mismatch when executing instruction {instruction.Mnemonic} - expected {_cycleCount - beforeCount} but got {ControlLines.SystemClock.Ticks - beforeCount} cycles");
             }
 
             if (Registers.IFF1 && ControlLines.INT.Value == TristateWireState.LogicLow)
@@ -34,11 +97,38 @@ namespace Z80Sharp
             }
         }
 
+        private void HandleRESET()
+        {
+            Registers.IFF1 = false;
+            Registers.IFF2 = false;
+            Registers.PC = 0;
+            Registers.I = 0;
+            Registers.R = 0;
+            Registers.InterruptMode = Z80InterruptMode.External;
+
+            ControlLines.AddressBus.WriteValue(this, null);
+            ControlLines.DataBus.WriteValue(this, null);
+            ControlLines.HALT.WriteValue(this, TristateWireState.LogicHigh);
+            ControlLines.IORQ.WriteValue(this, TristateWireState.LogicHigh);
+            ControlLines.M1.WriteValue(this, TristateWireState.LogicHigh);
+            ControlLines.MREQ.WriteValue(this, TristateWireState.LogicHigh);
+            ControlLines.RD.WriteValue(this, TristateWireState.LogicHigh);
+            ControlLines.RFSH.WriteValue(this, TristateWireState.LogicHigh);
+            ControlLines.WR.WriteValue(this, TristateWireState.LogicHigh);
+
+            ControlLines.SystemClock.TickMultiple(3);
+
+            while (ControlLines.RESET.Value == TristateWireState.LogicLow)
+            {
+                ControlLines.SystemClock.Tick();
+            }
+        }
+
         private void HandleNMI()
         {
             Registers.IFF2 = Registers.IFF1;
             Registers.IFF1 = false;
-            ControlLines.SystemClock.Tick();
+            AcknowledgeInterrupt();
             // TODO: Check if NMI is supposed to be able to fire during this push
             PushWord(Registers.PC);
             Registers.PC = 0x66;
@@ -72,7 +162,10 @@ namespace Z80Sharp
 
         private byte AcknowledgeInterrupt()
         {
+            InterruptsBeingServiced.Push(Registers.PC);
+
             // TODO: Check the timing for this
+            ControlLines.HALT.WriteValue(this, TristateWireState.LogicHigh);
             ControlLines.SystemClock.Tick();
 
             ControlLines.AddressBus.WriteValue(this, Registers.PC);

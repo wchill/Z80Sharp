@@ -6,16 +6,20 @@ namespace Z80Sharp
     public class PassthroughClock : IClock
     {
         public long Ticks { get; private set; }
-        public List<IClockedComponent> AttachedDevices { get; }
+        public HashSet<IClockedComponent> AttachedDevices { get; }
 
         public PassthroughClock()
         {
-            AttachedDevices = new List<IClockedComponent>();
+            AttachedDevices = new HashSet<IClockedComponent>();
         }
 
         public void AttachClockableDevice(IClockedComponent device)
         {
             AttachedDevices.Add(device);
+        }
+        public void DetachClockableDevice(IClockedComponent device)
+        {
+            AttachedDevices.Remove(device);
         }
 
         public void TickMultiple(int ticks)

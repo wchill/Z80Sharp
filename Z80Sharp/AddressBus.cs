@@ -18,7 +18,7 @@ namespace Z80Sharp
             _attachedDevices = new List<IDevice>();
         }
 
-        public void WriteValue(IDevice device, ushort value)
+        public void WriteValue(IDevice device, ushort? value)
         {
             _value = value;
         }

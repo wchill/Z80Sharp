@@ -8,5 +8,7 @@ namespace Z80Sharp
     {
         int Size { get; }
         MemoryLines Connections { get; }
+
+        void LoadIntoMemory(ushort address, ReadOnlySpan<byte> data);
     }
 }
