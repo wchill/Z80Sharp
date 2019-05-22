@@ -10,30 +10,18 @@ namespace Z80Sharp.Instructions
         public string Mnemonic { get; }
         public bool Undocumented { get; }
         public int InstructionLength { get; }
+        public bool ControlInstruction { get; }
 
         private readonly Func<IZ80CPU, byte[], int> _action;
 
-        public Instruction(byte opcode, string mnemonic, int len, Func<IZ80CPU, byte[], int> action)
-        {
-            Opcode = new[] { opcode };
-            Mnemonic = mnemonic;
-            Undocumented = false;
-            _action = action;
-            InstructionLength = len;
-        }
-
-        public Instruction(byte[] opcode, string mnemonic, int len, Func<IZ80CPU, byte[], int> action)
-            : this(opcode, mnemonic, len, false, action)
-        {
-        }
-
-        public Instruction(byte[] opcode, string mnemonic, int len, bool undocumented, Func<IZ80CPU, byte[], int> action)
+        public Instruction(byte[] opcode, string mnemonic, int len, bool undocumented, bool controlInstruction, Func<IZ80CPU, byte[], int> action)
         {
             Opcode = opcode;
             Mnemonic = mnemonic;
             Undocumented = undocumented;
             _action = action;
             InstructionLength = len;
+            ControlInstruction = controlInstruction;
         }
 
         public int Execute(IZ80CPU cpu, byte[] instruction)

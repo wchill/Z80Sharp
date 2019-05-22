@@ -10,6 +10,7 @@ namespace Z80Sharp.Instructions
         string Mnemonic { get; }
         bool Undocumented { get; }
         int InstructionLength { get; }
+        bool ControlInstruction { get; }
 
         int Execute(IZ80CPU cpu, byte[] instruction);
     }

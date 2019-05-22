@@ -106,7 +106,7 @@ namespace Z80Sharp.Instructions
             cpu.Registers.ParityOrOverflow = cpu.Registers.BC != 0;
             cpu.Registers.Subtract = false;
 
-            if (cpu.Registers.BC != 0) return 16;
+            if (cpu.Registers.BC == 0) return 16;
 
             cpu.Registers.PC -= 2;
             cpu.InsertWaitMachineCycle(5);
@@ -141,7 +141,7 @@ namespace Z80Sharp.Instructions
             cpu.Registers.ParityOrOverflow = cpu.Registers.BC != 0;
             cpu.Registers.Subtract = false;
 
-            if (cpu.Registers.BC != 0) return 16;
+            if (cpu.Registers.BC == 0) return 16;
 
             cpu.Registers.PC -= 2;
             cpu.InsertWaitMachineCycle(5);

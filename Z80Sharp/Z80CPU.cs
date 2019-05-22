@@ -81,10 +81,10 @@ namespace Z80Sharp
                 _cycleCount += Z80Instructions.RET(this, null);
             }
 
-            var instruction = InstructionDecoder.DecodeNextInstruction(this, out var instrBytes);
+            var instruction = InstructionDecoder.DecodeNextInstruction(this);
 
             var beforeCount = _cycleCount;
-            _cycleCount += instruction.Execute(this, instrBytes);
+            _cycleCount += instruction.Execute(this, instruction.InstructionBytes);
 
             if (_cycleCount != ControlLines.SystemClock.Ticks)
             {
@@ -141,8 +141,8 @@ namespace Z80Sharp
 
             if (Registers.InterruptMode == Z80InterruptMode.External)
             {
-                var instr = InstructionDecoder.DecodeNextInstruction(this, out var instrBytes, opcode);
-                instr.Execute(this, instrBytes);
+                var instr = InstructionDecoder.DecodeNextInstruction(this, opcode);
+                instr.Execute(this, instr.InstructionBytes);
             }
             else if (Registers.InterruptMode == Z80InterruptMode.FixedAddress)
             {

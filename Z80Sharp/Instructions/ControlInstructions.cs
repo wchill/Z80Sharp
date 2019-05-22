@@ -69,6 +69,7 @@ namespace Z80Sharp.Instructions
 
         #region Jump
 
+        [ControlInstruction]
         [MainInstruction("JP nn", 3, 0xC3)]
         public static int JP_nn(IZ80CPU cpu, byte[] instruction)
         {
@@ -76,6 +77,7 @@ namespace Z80Sharp.Instructions
             return 10;
         }
 
+        [ControlInstruction]
         [MainInstruction("JP NZ, nn", 3, 0xC2)]
         [MainInstruction("JP Z, nn", 3, 0xCA)]
         [MainInstruction("JP NC, nn", 3, 0xD2)]
@@ -109,6 +111,7 @@ namespace Z80Sharp.Instructions
             return 10;
         }
 
+        [ControlInstruction]
         [MainInstruction("JR e", 2, 0x18)]
         public static int JR_e(IZ80CPU cpu, byte[] instruction)
         {
@@ -128,6 +131,7 @@ namespace Z80Sharp.Instructions
             return 12;
         }
 
+        [ControlInstruction]
         [MainInstruction("JR C, e", 2, 0x38)]
         [MainInstruction("JR NC, e", 2, 0x30)]
         [MainInstruction("JR Z, e", 2, 0x28)]
@@ -165,6 +169,7 @@ namespace Z80Sharp.Instructions
 
         }
 
+        [ControlInstruction]
         [MainInstruction("JP (HL)", 1, 0xE9)]
         public static int JP_HL(IZ80CPU cpu, byte[] instruction)
         {
@@ -172,6 +177,7 @@ namespace Z80Sharp.Instructions
             return 4;
         }
 
+        [ControlInstruction]
         [IXInstruction("JP (IX)", 2, 0xDD, 0xE9)]
         public static int JP_IX(IZ80CPU cpu, byte[] instruction)
         {
@@ -179,6 +185,7 @@ namespace Z80Sharp.Instructions
             return 8;
         }
 
+        [ControlInstruction]
         [IYInstruction("JP (IY)", 2, 0xFD, 0xE9)]
         public static int JP_IY(IZ80CPU cpu, byte[] instruction)
         {
@@ -186,6 +193,7 @@ namespace Z80Sharp.Instructions
             return 8;
         }
 
+        [ControlInstruction]
         [MainInstruction("DJNZ, e", 2, 0x10)]
         public static int DJNZ_e(IZ80CPU cpu, byte[] instruction)
         {
@@ -216,6 +224,7 @@ namespace Z80Sharp.Instructions
 
         #region Call/Return
 
+        [ControlInstruction]
         [MainInstruction("CALL nn", 3, 0xCD)]
         public static int CALL_nn(IZ80CPU cpu, byte[] instruction)
         {
@@ -225,6 +234,7 @@ namespace Z80Sharp.Instructions
             return 17;
         }
 
+        [ControlInstruction]
         [MainInstruction("CALL NZ, nn", 3, 0xC4)]
         [MainInstruction("CALL Z, nn", 3, 0xCC)]
         [MainInstruction("CALL NC, nn", 3, 0xD4)]
@@ -259,6 +269,7 @@ namespace Z80Sharp.Instructions
             return 17;
         }
 
+        [ControlInstruction]
         [MainInstruction("RET", 1, 0xC9)]
         public static int RET(IZ80CPU cpu, byte[] instruction)
         {
@@ -268,6 +279,7 @@ namespace Z80Sharp.Instructions
             return 10;
         }
 
+        [ControlInstruction]
         [MainInstruction("RET NZ", 1, 0xC0)]
         [MainInstruction("RET Z", 1, 0xC8)]
         [MainInstruction("RET NC", 1, 0xD0)]
@@ -303,6 +315,7 @@ namespace Z80Sharp.Instructions
             return 11;
         }
 
+        [ControlInstruction]
         [ExtendedInstruction("RETI", 2, 0xED, 0x4D)]
         public static int RETI(IZ80CPU cpu, byte[] instruction)
         {
@@ -313,6 +326,7 @@ namespace Z80Sharp.Instructions
             return 14;
         }
 
+        [ControlInstruction]
         [ExtendedInstruction("RETN", 2, 0xED, 0x45)]
         public static int RETN(IZ80CPU cpu, byte[] instruction)
         {
@@ -324,6 +338,7 @@ namespace Z80Sharp.Instructions
             return 14;
         }
 
+        [ControlInstruction]
         [MainInstruction("RST 00h", 1, 0xC7)]
         [MainInstruction("RST 08h", 1, 0xCF)]
         [MainInstruction("RST 10h", 1, 0xD7)]

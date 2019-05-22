@@ -33,8 +33,9 @@ namespace Z80Sharp.Instructions
                 $"Instruction {string.Join(" ", instruction.Select(b => b.ToString("X2")))} is not implemented.");
         }
 
-        public static IInstruction DecodeNextInstruction(IZ80CPU cpu, out byte[] instrBytes, byte? initialByte = null)
+        public static DisassembledInstruction DecodeNextInstruction(IZ80CPU cpu, byte? initialByte = null)
         {
+            var addr = cpu.Registers.PC;
             var data = new List<byte>
             {
                 initialByte ?? cpu.FetchOpcode()
@@ -91,9 +92,8 @@ namespace Z80Sharp.Instructions
                 data.Add(cpu.ReadMemory(cpu.Registers.PC));
                 cpu.Registers.PC++;
             }
-
-            instrBytes = data.ToArray();
-            return instruction;
+            
+            return new DisassembledInstruction(instruction, data.ToArray(), addr);
         }
 
         private static IInstruction[] ConstructInstructionTablesByReflection<T>() where T : InstructionAttribute
@@ -104,10 +104,13 @@ namespace Z80Sharp.Instructions
             {
                 var attrs = method.GetAttributes<T>();
                 if (!attrs.Any()) continue;
+
+                var isControl = method.GetCustomAttributes(typeof(ControlInstructionAttribute), true).Any();
+
                 foreach (var attr in attrs)
                 {
                     var func = (Func<IZ80CPU, byte[], int>)Delegate.CreateDelegate(typeof(Func<IZ80CPU, byte[], int>), method);
-                    var instruction = new Instruction(attr.Opcode, attr.Mnemonic, attr.Length, func);
+                    var instruction = new Instruction(attr.Opcode, attr.Mnemonic, attr.Length, attr.Undocumented, isControl, func);
 
                     if (instructions[attr.Opcode.Last()] != null)
                     {
@@ -122,7 +125,7 @@ namespace Z80Sharp.Instructions
             {
                 if (instructions[i] == null)
                 {
-                    instructions[i] = new Instruction((byte)i, null, 1, UnimplementedOpcode);
+                    instructions[i] = new Instruction(new [] {(byte) i}, null, 1, true, true, UnimplementedOpcode);
                 }
             }
 
